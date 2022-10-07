@@ -5,16 +5,13 @@ function PokedexPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    console.log('mounted');
     fetch('https://pokeapi.co/api/v2/pokemon/').then((r) => r.json()).then((r) => setData(r));
 
     return () => {
       // cancel request
-      console.log('unmounted');
     };
   }, []);
 
-  console.log(data);
   if (!data) {
     return <span>Loading...</span>;
   }
