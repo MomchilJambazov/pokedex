@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
+import Skeleton from '@mui/material/Skeleton';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -68,55 +68,77 @@ function PokemonDetailsPage() {
     navigate(`/pokemon/${nextPokemonId}`);
   }, [navigate, pokemonId]);
 
-  if (!pokemonQuery.data) {
-    return null;
-  }
-
-  if (pokemonQuery.isLoading) {
-    return <>Loading...</>;
-  }
-
   if (pokemonQuery.isError) {
     return <>Error</>;
   }
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={6} lg={4}>
-        <img src={avatar} alt={name} style={{ width: '100%', marginBottom: '-270px' }} />
+    <Grid container spacing={2} sx={{ mt: 12 }}>
+      <Grid item xs={12} md={6} lg={4} sx={{ position: 'relative' }}>
+        <img
+          src={avatar}
+          alt={name}
+          style={{
+            margin: '0 auto', left: 0, right: 0, maxHeight: '390px', position: 'absolute', top: '-105px',
+          }}
+        />
         <Card sx={{ boxShadow: '0 5px 10px #d0efef' }}>
           <CardContent>
-            <Box sx={{
-              m: -2, mb: 2, background: species ? species?.color?.name : '', height: '250px',
-            }}
-            />
+            {pokemonQuery.isLoading ? <Skeleton variant="rectangular" width="110%" height={250} sx={{ m: -2, mb: 2 }} />
+              : (
+                <Box sx={{
+                  m: -2, mb: 2, background: species ? species?.color?.name : '', height: '250px',
+                }}
+                />
+              )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography sx={{ m: 0, textTransform: 'capitalize', mb: 1 }} gutterBottom variant="h4" component="div">
-                {name}
-              </Typography>
+              {pokemonQuery.isLoading ? <Skeleton variant="text" width="70%" height={40} />
+                : (
+                  <Typography sx={{ m: 0, textTransform: 'capitalize', mb: 1 }} gutterBottom variant="h4" component="div">
+                    {name}
+                  </Typography>
+                )}
               <Box sx={{ minWidth: '96px', display: 'flex', justifyContent: 'end' }}>
-                {types.map((el:any) => <PokemonTypeBadge key={el.type.name} type={el.type.name} />)}
+                {pokemonQuery.isLoading ? <Skeleton variant="circular" width={40} height={40} />
+                  : types?.map((el: any) => <PokemonTypeBadge key={el.type.name} type={el.type.name} />)}
               </Box>
             </Box>
             <Box sx={{ display: 'flex', mt: 2 }}>
-              {versionGroupName && pokemonVersionPreview && <Box sx={{ mr: 1, mb: 1 }}><img className="" src={pokemonVersionPreview} /></Box>}
-              <Typography sx={{ mb: 3 }} variant="body2" color="text.secondary">
-                {species && species?.flavor_text_entries?.map((entry:any) => entry.language.name === 'en' && entry.version.name === activeVersion && entry.flavor_text)}
-              </Typography>
+              {pokemonQuery.isLoading ? (
+                <>
+                  <Skeleton variant="text" width="40px" height="60px" />
+                  <Box width="100%" sx={{ ml: 2, mt: 1 }}>
+                    <Skeleton variant="text" width="100%" />
+                    <Skeleton variant="text" width="70%" />
+                  </Box>
+                </>
+              )
+                : (
+                  <>
+                    {versionGroupName && pokemonVersionPreview && <Box sx={{ mr: 1, mb: 1 }}><img className="" src={pokemonVersionPreview} /></Box>}
+                    <Typography sx={{ mb: 3 }} variant="body2" color="text.secondary">
+                      {species && species?.flavor_text_entries?.map((entry: any) => entry.language.name === 'en' && entry.version.name === activeVersion && entry.flavor_text)}
+                    </Typography>
+
+                  </>
+                )}
             </Box>
-            {availableVersions?.length && availableVersions.includes(activeVersion) && (
-            <FormControl sx={{ mt: 2 }} fullWidth>
-              <InputLabel>Game version</InputLabel>
-              <Select
-                size="small"
-                value={activeVersion}
-                label="Game version"
-                onChange={(e:SelectChangeEvent) => setActiveVersion(e.target.value)}
-              >
-                {availableVersions?.map((v:string) => <MenuItem key={v} value={v}><Typography sx={{ textTransform: 'capitalize' }} component="span">{v.replaceAll('-', ' ')}</Typography></MenuItem>)}
-              </Select>
-            </FormControl>
-            )}
+            {
+              pokemonQuery.isLoading ? <Skeleton variant="text" width="100%" height={60} />
+                : availableVersions?.length && availableVersions.includes(activeVersion) && (
+                <FormControl sx={{ mt: 2 }} fullWidth>
+                  <InputLabel>Game version</InputLabel>
+                  <Select
+                    size="small"
+                    value={activeVersion}
+                    label="Game version"
+                    onChange={(e: SelectChangeEvent) => setActiveVersion(e.target.value)}
+                  >
+                    {availableVersions?.map((v: string) => <MenuItem key={v} value={v}><Typography sx={{ textTransform: 'capitalize' }} component="span">{v.replaceAll('-', ' ')}</Typography></MenuItem>)}
+                  </Select>
+                </FormControl>
+                )
+}
           </CardContent>
           <CardActions sx={{ justifyContent: 'space-between' }}>
             {pokemonId > 1 && <Button variant="text" onClick={goToPreviousPokemon}>Previous</Button>}
@@ -125,7 +147,11 @@ function PokemonDetailsPage() {
         </Card>
         <PokedexKeyboardNavigation next={goToNextPokemon} prev={goToPreviousPokemon} />
       </Grid>
-      <Grid item xs={8} />
+      <Grid item xs={8}>
+        <p>TODO: add overview and abilities</p>
+        <p>TODO: add stats</p>
+        <p>TODO: add evolution</p>
+      </Grid>
     </Grid>
   );
 }
