@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -13,7 +13,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-const DEFAULT_VERSION = 'red';
+import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
+
+const DEFAULT_GAME_VERSION = 'red';
 
 function PokemonDetailsPage() {
   const params = useParams();
@@ -21,7 +23,7 @@ function PokemonDetailsPage() {
 
   const { id } = params;
 
-  const [activeVersion, setActiveVersion] = useState(DEFAULT_VERSION);
+  const [activeVersion, setActiveVersion] = useState(DEFAULT_GAME_VERSION);
 
   const pokemonQuery = useQuery(['pokemon', id], () => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json()));
 
@@ -35,7 +37,10 @@ function PokemonDetailsPage() {
 
   const versionQuery = useQuery(['version', activeVersion], () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => r.json()));
 
-  const avatar = sprites?.other?.home.front_default;
+  const homePicture = sprites?.other?.home.front_default;
+  const officialArtwork = sprites?.other?.['official-artwork'].front_default;
+
+  const avatar = homePicture || officialArtwork;
   const { versions: spriteVersions } = sprites || {};
   const vSprites: any = sprites ? Object.values(spriteVersions).reduce((acc: any, el: any) => ({ ...acc, ...el })) : {};
   const versionGroupName = versionQuery?.data?.version_group.name;
@@ -49,6 +54,18 @@ function PokemonDetailsPage() {
     }
   }, [activeVersion, availableVersions]);
 
+  const goToPreviousPokemon = useCallback(() => {
+    const previousPokemonId = parseInt(pokemonId, 10) - 1;
+    if (!Number.isInteger(previousPokemonId) || previousPokemonId < 1) return; // early return to prevent negative values
+    navigate(`/pokemon/${previousPokemonId}`);
+  }, [navigate, pokemonId]);
+
+  const goToNextPokemon = useCallback(() => {
+    const nextPokemonId = parseInt(pokemonId, 10) + 1;
+    if (!Number.isInteger(nextPokemonId)) return;
+    navigate(`/pokemon/${nextPokemonId}`);
+  }, [navigate, pokemonId]);
+
   if (!pokemonQuery.data) {
     return null;
   }
@@ -61,19 +78,8 @@ function PokemonDetailsPage() {
     return <>Error</>;
   }
 
-  const goToPreviousPokemon = () => {
-    const previousPokemonId = parseInt(pokemonId, 10) - 1;
-    if (previousPokemonId < 1) return; // early return to prevent negative values
-    navigate(`/pokemon/${previousPokemonId}`);
-  };
-
-  const goToNextPokemon = () => {
-    const nextPokemonId = parseInt(pokemonId, 10) + 1;
-    navigate(`/pokemon/${nextPokemonId}`);
-  };
-
   return (
-    <div>
+    <>
       <img src={avatar} alt={name} style={{ maxWidth: '35%', marginBottom: '-270px' }} />
 
       <Card sx={{ maxWidth: '35%' }}>
@@ -111,7 +117,8 @@ function PokemonDetailsPage() {
           <Button variant="text" onClick={goToNextPokemon}>Next</Button>
         </CardActions>
       </Card>
-    </div>
+      <PokedexKeyboardNavigation next={goToNextPokemon} prev={goToPreviousPokemon} />
+    </>
   );
 }
 
