@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
+import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 
 const DEFAULT_GAME_VERSION = 'red';
 
@@ -89,10 +90,14 @@ function PokemonDetailsPage() {
               m: -2, mb: 2, background: species ? species?.color?.name : '', height: '250px',
             }}
             />
-            <Typography sx={{ textTransform: 'capitalize', mb: 1 }} gutterBottom variant="h4" component="div">
-              {name}
-            </Typography>
-            {types.map((el:any) => <Chip key={el.type.name} sx={{ mr: 1, mb: 1, textTransform: 'capitalize' }} label={el.type.name} />)}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography sx={{ m: 0, textTransform: 'capitalize', mb: 1 }} gutterBottom variant="h4" component="div">
+                {name}
+              </Typography>
+              <Box sx={{ minWidth: '96px', display: 'flex', justifyContent: 'end' }}>
+                {types.map((el:any) => <PokemonTypeBadge key={el.type.name} type={el.type.name} />)}
+              </Box>
+            </Box>
             <Box sx={{ display: 'flex', mt: 2 }}>
               {versionGroupName && pokemonVersionPreview && <Box sx={{ mr: 1, mb: 1 }}><img className="" src={pokemonVersionPreview} /></Box>}
               <Typography sx={{ mb: 3 }} variant="body2" color="text.secondary">
