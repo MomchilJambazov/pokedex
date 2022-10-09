@@ -16,6 +16,8 @@ import Box from '@mui/material/Box';
 
 import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
+import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
+import usePokemon from '../../hooks/usePokemon';
 
 const DEFAULT_GAME_VERSION = 'red';
 
@@ -23,11 +25,11 @@ function PokemonDetailsPage() {
   const params = useParams();
   const navigate = useNavigate();
 
-  const { id } = params;
+  const { id: nameOrId } = params;
 
   const [activeVersion, setActiveVersion] = useState(DEFAULT_GAME_VERSION);
 
-  const pokemonQuery = useQuery(['pokemon', id], () => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json()));
+  const pokemonQuery = usePokemon(nameOrId);
 
   const {
     name, sprites, types, id: pokemonId,
@@ -126,31 +128,33 @@ function PokemonDetailsPage() {
             {
               pokemonQuery.isLoading ? <Skeleton variant="text" width="100%" height={60} />
                 : availableVersions?.length && availableVersions.includes(activeVersion) && (
-                <FormControl sx={{ mt: 2 }} fullWidth>
-                  <InputLabel>Game version</InputLabel>
-                  <Select
-                    size="small"
-                    value={activeVersion}
-                    label="Game version"
-                    onChange={(e: SelectChangeEvent) => setActiveVersion(e.target.value)}
-                  >
-                    {availableVersions?.map((v: string) => <MenuItem key={v} value={v}><Typography sx={{ textTransform: 'capitalize' }} component="span">{v.replaceAll('-', ' ')}</Typography></MenuItem>)}
-                  </Select>
-                </FormControl>
+                  <FormControl sx={{ mt: 2 }} fullWidth>
+                    <InputLabel>Game version</InputLabel>
+                    <Select
+                      size="small"
+                      value={activeVersion}
+                      label="Game version"
+                      onChange={(e: SelectChangeEvent) => setActiveVersion(e.target.value)}
+                    >
+                      {availableVersions?.map((v: string) => <MenuItem key={v} value={v}><Typography sx={{ textTransform: 'capitalize' }} component="span">{v.replaceAll('-', ' ')}</Typography></MenuItem>)}
+                    </Select>
+                  </FormControl>
                 )
-}
+            }
           </CardContent>
-          <CardActions sx={{ justifyContent: 'space-between' }}>
-            {pokemonId > 1 && <Button variant="text" onClick={goToPreviousPokemon}>Previous</Button>}
-            <Button variant="text" onClick={goToNextPokemon}>Next</Button>
-          </CardActions>
+          {pokemonQuery?.data && (
+            <CardActions sx={{ justifyContent: 'space-between' }}>
+              {pokemonId > 1 && <Button variant="text" onClick={goToPreviousPokemon}>Previous</Button>}
+              <Button variant="text" onClick={goToNextPokemon}>Next</Button>
+            </CardActions>
+          )}
         </Card>
         <PokedexKeyboardNavigation next={goToNextPokemon} prev={goToPreviousPokemon} />
       </Grid>
       <Grid item xs={8}>
         <p>TODO: add overview and abilities</p>
         <p>TODO: add stats</p>
-        <p>TODO: add evolution</p>
+        <PokemonEvolutionGraph evolutionChainUrl={species?.evolution_chain?.url} name={name} />
       </Grid>
     </Grid>
   );

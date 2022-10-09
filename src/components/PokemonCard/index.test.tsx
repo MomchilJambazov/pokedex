@@ -1,11 +1,8 @@
-/**
- * Testing file for the HelloWorld component.
- */
 import { render, screen } from '@testing-library/react';
-import HelloWorld from '.';
+import PokemonCard from '.';
 
-test('Render HelloWorld Component', () => {
-  render(<HelloWorld />);
+test('Render Component', () => {
+  render(<PokemonCard name="pickachu" />);
   const element = screen.getByText(/Hello World!/i);
   expect(element).toBeInTheDocument();
 });

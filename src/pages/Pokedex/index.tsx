@@ -1,25 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import PokemonCard from '../../components/PokemonCard';
+import usePokemon from '../../hooks/usePokemon';
 
 function PokedexPage() {
-  const [data, setData] = useState<any>(null);
+  const [requestParams, setParams] = useState<string>('');
+  const query = usePokemon(requestParams);
 
-  useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon/').then((r) => r.json()).then((r) => setData(r));
+  const { data } = query;
 
-    return () => {
-      // cancel request
-    };
-  }, []);
-
-  if (!data) {
-    return <span>Loading...</span>;
-  }
+  const next = data?.next ? `?${data?.next.split('?')[1]}` : '';
+  const previous = data?.previous ? `?${data?.previous.split('?')[1]}` : '';
 
   return (
-    <ul>
-      {data?.results.map((pokemon: any) => <li key={pokemon.name}><Link to={`/pokemon/${pokemon.name}`}>{pokemon.name}</Link></li>)}
-    </ul>
+    <>
+      <Grid sx={{ mt: 4 }} container spacing={2}>
+        {data?.results.map((pokemon: any) => (
+          <PokemonCard key={pokemon?.name} name={pokemon?.name} />
+        ))}
+      </Grid>
+      <Box sx={{
+        pt: 3, mb: 4, display: 'flex', justifyContent: 'center', width: '100%',
+      }}
+      >
+        {data?.previous && <Button onClick={() => { setParams(previous); }}>Prev</Button>}
+        {data?.next && <Button onClick={() => { setParams(next); }}>Next</Button>}
+      </Box>
+    </>
   );
 }
 
