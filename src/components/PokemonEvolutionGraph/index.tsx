@@ -5,6 +5,7 @@ import Tree from 'react-d3-tree';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import styles from './index.module.scss';
 
@@ -21,7 +22,7 @@ interface NodeProps {
 
 function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGraphProps) {
   const [dataTree, setDataTree] = useState<any>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const evolutionId = evolutionChainUrl?.split('/')?.filter((e) => Number.isInteger(parseInt(e, 10)))[0];
   const evolutionQuery = useQuery(['evolution', evolutionId], () => fetch(evolutionChainUrl).then((r) => r.json()));
@@ -29,6 +30,7 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
   const evolutionChain = evolutionQuery?.data?.chain;
 
   const generateTree = useCallback(async (chain:any) => {
+    if (!chain?.species) return null;
     setLoading(true);
     const speciesData = await fetch(`https://pokeapi.co/api/v2/pokemon/${chain?.species.name}`).then((r) => r.json());
     const children = await Promise.all(chain?.evolves_to?.map((c:any) => generateTree(c)));
@@ -44,11 +46,7 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
     if (evolutionChainUrl) {
       generateTree(evolutionChain).then((r) => setDataTree(r)).finally(() => setLoading(false));
     }
-  }, [evolutionChainUrl, evolutionChain, generateTree]);
-
-  useEffect(() => {
-    setDataTree(null);
-  }, [name]);
+  }, [name, evolutionChainUrl, evolutionChain, generateTree]);
 
   const handleNodeClick = (nodeDatum: any) => {
     navigate(`/pokemon/${nodeDatum.name}`);
@@ -61,7 +59,7 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
     <g>
       <defs>
         <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#00bc9b" />
+          <stop offset="0%" stopColor="#1976d2" />
           <stop offset="100%" stopColor="#5eaefd" />
         </linearGradient>
         <pattern
@@ -96,10 +94,8 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
 
   if (isLoading) {
     return (
-      <Box sx={{
-        display: 'flex', alignItems: 'center', width: '100%', height: '300px',
-      }}
-      >
+      <Box sx={{ p: 15 }}>
+        <Typography sx={{ textAlign: 'center', mb: 2 }}>Generating evolution graph</Typography>
         <LinearProgress />
       </Box>
     );

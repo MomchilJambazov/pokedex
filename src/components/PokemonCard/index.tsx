@@ -15,6 +15,7 @@ export interface PokemonCardProps {
 
 function PokemonCard({ name }: PokemonCardProps) {
   const query = usePokemon(name);
+
   const { data, isLoading, isError } = query;
   const image = data?.sprites?.other['official-artwork']?.front_default;
 
@@ -28,13 +29,13 @@ function PokemonCard({ name }: PokemonCardProps) {
         <Card sx={{ display: 'flex', justifyContent: 'space-between' }}>
           {isLoading ? (
             <>
-              <Box sx={{ p: 3, width: '100%' }}>
+              <Box sx={{ p: 2, width: '100%' }}>
                 <Skeleton variant="text" sx={{ fontSize: '1.75rem' }} width="100%" animation="wave" />
                 <Skeleton width="20%" animation="wave" />
                 <br />
                 <Skeleton variant="circular" width={32} height={32} animation="wave" />
               </Box>
-              <Skeleton animation="wave" variant="rectangular" width={180} height={120} />
+              <Skeleton animation="wave" variant="rectangular" width={180} height={140} />
             </>
           )
             : (

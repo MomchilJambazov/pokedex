@@ -74,6 +74,8 @@ function PokemonDetailsPage() {
     return <>Error</>;
   }
 
+  const evolutionChainUrl = species?.evolution_chain?.url;
+
   return (
     <Grid container spacing={2} sx={{ mt: 12 }}>
       <Grid item xs={12} md={6} lg={4} sx={{ position: 'relative' }}>
@@ -154,7 +156,7 @@ function PokemonDetailsPage() {
       <Grid item xs={8}>
         <p>TODO: add overview and abilities</p>
         <p>TODO: add stats</p>
-        <PokemonEvolutionGraph evolutionChainUrl={species?.evolution_chain?.url} name={name} />
+        {evolutionChainUrl && <PokemonEvolutionGraph evolutionChainUrl={evolutionChainUrl} name={name} />}
       </Grid>
     </Grid>
   );
