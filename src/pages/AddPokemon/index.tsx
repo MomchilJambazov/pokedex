@@ -1,16 +1,15 @@
 import { useForm, Controller } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Tooltip from '@mui/material/Tooltip';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Slider from '@mui/material/Slider';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { useSelector, useDispatch } from 'react-redux';
+import { add } from '../../app/pokedexSlice';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 
 const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'fighting', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
@@ -143,7 +142,15 @@ const AddPokemonPage = () => {
     },
   });
 
-  const onSubmit = (data: any) => console.log(data);
+  const state = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  const onSubmit = (data: any) => {
+    dispatch({
+      type: 'pokemons/add',
+      payload: data,
+    });
+  };
 
   return (
     <>
