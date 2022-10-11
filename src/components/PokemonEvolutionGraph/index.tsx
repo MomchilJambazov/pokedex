@@ -1,6 +1,4 @@
-import {
-  useEffect, useState, useCallback, memo,
-} from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Tree from 'react-d3-tree';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +6,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import styles from './index.module.scss';
+
+const TREE_HEIGHT = 350;
 
 interface PokemonEvolutionGraphProps {
   name: string;
@@ -25,7 +25,7 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
   const [isLoading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const evolutionId = evolutionChainUrl?.split('/')?.filter((e) => Number.isInteger(parseInt(e, 10)))[0];
-  const evolutionQuery = useQuery(['evolution', evolutionId], () => fetch(evolutionChainUrl).then((r) => r.json()));
+  const evolutionQuery = useQuery(['evolution', evolutionId], () => fetch(evolutionChainUrl).then((r) => r.json()), { retry: 2, staleTime: Infinity });
 
   const evolutionChain = evolutionQuery?.data?.chain;
 
@@ -92,6 +92,10 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
     </g>
   );
 
+  if (evolutionQuery.isError) {
+    return <p>Error</p>;
+  }
+
   if (isLoading) {
     return (
       <Box sx={{ p: 15 }}>
@@ -101,17 +105,23 @@ function PokemonEvolutionGraph({ name, evolutionChainUrl }: PokemonEvolutionGrap
     );
   }
   if (!dataTree || !evolutionChainUrl) return null;
+
   return (
-    <Tree
-      data={dataTree}
-      collapsible={false}
-      nodeSize={{ x: 200, y: 180 }}
-      translate={{ x: 100, y: 200 }}
-      pathClassFunc={() => styles.baba}
-      renderCustomNodeElement={(rd3tProps) => renderNodeWithCustomEvents({ ...rd3tProps, handleNodeClick })}
-      zoomable={false}
-    />
+    <>
+      <Typography sx={{ textAlign: 'center', mt: 5 }} variant="h6">Evolution tree</Typography>
+      <div id="treeWrapper" style={{ width: '100%', height: `${TREE_HEIGHT}px` }}>
+        <Tree
+          data={dataTree}
+          collapsible={false}
+          nodeSize={{ x: 200, y: TREE_HEIGHT / 2 - 10 }}
+          translate={{ x: 180, y: TREE_HEIGHT / 2 - 10 }}
+          pathClassFunc={() => styles.baba}
+          renderCustomNodeElement={(rd3tProps) => renderNodeWithCustomEvents({ ...rd3tProps, handleNodeClick })}
+          zoomable={false}
+        />
+      </div>
+    </>
   );
 }
 
-export default memo(PokemonEvolutionGraph);
+export default PokemonEvolutionGraph;

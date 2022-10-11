@@ -13,9 +13,9 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-
 import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
+import PokemonStats from '../../components/PokemonStats';
 import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
 import usePokemon from '../../hooks/usePokemon';
 
@@ -32,14 +32,14 @@ function PokemonDetailsPage() {
   const pokemonQuery = usePokemon(nameOrId);
 
   const {
-    name, sprites, types, id: pokemonId,
+    name, sprites, types, id: pokemonId, height, weight, stats, base_experience: baseExperience, abilities,
   }: any = pokemonQuery?.data || {};
   const { name: speciesName, url: speciesUrl } = pokemonQuery?.data?.species || {};
 
-  const speciesQuery: any = useQuery(['species', speciesName], () => (speciesUrl ? fetch(speciesUrl).then((r) => r.json()) : null));
+  const speciesQuery: any = useQuery(['species', speciesName], () => (speciesUrl ? fetch(speciesUrl).then((r) => r.json()) : null), { retry: 2, staleTime: Infinity });
   const species = speciesQuery.data;
 
-  const versionQuery = useQuery(['version', activeVersion], () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => r.json()));
+  const versionQuery = useQuery(['version', activeVersion], () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => r.json()), { retry: 2, staleTime: Infinity });
 
   const homePicture = sprites?.other?.home.front_default;
   const officialArtwork = sprites?.other?.['official-artwork'].front_default;
@@ -91,7 +91,7 @@ function PokemonDetailsPage() {
             {pokemonQuery.isLoading ? <Skeleton variant="rectangular" width="110%" height={250} sx={{ m: -2, mb: 2 }} />
               : (
                 <Box sx={{
-                  m: -2, mb: 2, background: species ? species?.color?.name : '', height: '250px',
+                  m: -2, mb: 2, background: species ? species?.color?.name : 'silver', height: '250px',
                 }}
                 />
               )}
@@ -153,9 +153,35 @@ function PokemonDetailsPage() {
         </Card>
         <PokedexKeyboardNavigation next={goToNextPokemon} prev={goToPreviousPokemon} />
       </Grid>
-      <Grid item xs={8}>
-        <p>TODO: add overview and abilities</p>
-        <p>TODO: add stats</p>
+      <Grid item xs={12} md={6} lg={8}>
+        <p>
+          Height:
+          {' '}
+          {height / 10}
+          m
+        </p>
+        <p>
+          Weight:
+          {' '}
+          {weight / 10}
+          kg
+        </p>
+        <p>
+          Base Experience:
+          {' '}
+          {baseExperience}
+        </p>
+        <p>
+          Capture Rate:
+          {' '}
+          {species?.capture_rate}
+        </p>
+        <p>
+          Habitat:
+          {' '}
+          {species?.habitat?.name}
+        </p>
+        <PokemonStats stats={stats} />
         {evolutionChainUrl && <PokemonEvolutionGraph evolutionChainUrl={evolutionChainUrl} name={name} />}
       </Grid>
     </Grid>
