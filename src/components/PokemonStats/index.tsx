@@ -54,7 +54,7 @@ export default function PokemonStats({ stats }: {stats: any}) {
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell sx={{ textTransform: 'capitalize', width: '140px' }} component="th" scope="row">
-                  {name.replace('-', ' ')}
+                  {name.replaceAll('-', ' ')}
                 </TableCell>
                 <TableCell sx={{ width: '40px' }}>{baseStat}</TableCell>
                 <TableCell><LinearProgress sx={{ height: '15px' }} variant="determinate" value={(baseStat / deriveMaxLimit(name, baseStat)) * 100} /></TableCell>

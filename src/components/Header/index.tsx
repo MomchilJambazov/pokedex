@@ -69,7 +69,7 @@ function Header() {
             </Menu>
           </Box>
 
-          <Link to="/"><img src={Logo} width="160px" alt="Pokemon Logo" /></Link>
+          <Link to="/pokedex"><img src={Logo} width="160px" alt="Pokemon Logo" /></Link>
 
           <Box sx={{ flexGrow: 1, ml: 4, display: { xs: 'none', md: 'flex' } }}>
             {menuItems.map(({ url, label }) => (

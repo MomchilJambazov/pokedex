@@ -15,8 +15,9 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
-import PokemonStats from '../../components/PokemonStats';
+import PokemonOverview from '../../components/PokemonOverview';
 import PokemonAbilities from '../../components/PokemonAbilities';
+import PokemonStats from '../../components/PokemonStats';
 import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
 import usePokemon from '../../hooks/usePokemon';
 
@@ -35,9 +36,8 @@ function PokemonDetailsPage() {
   const {
     name, sprites, types, id: pokemonId, height, weight, stats, base_experience: baseExperience, abilities,
   }: any = pokemonQuery?.data || {};
-  const { name: speciesName, url: speciesUrl } = pokemonQuery?.data?.species || {};
 
-  const speciesQuery: any = useQuery(['species', speciesName], () => (speciesUrl ? fetch(speciesUrl).then((r) => r.json()) : null), { retry: 2, staleTime: Infinity });
+  const speciesQuery: any = useQuery(['species', nameOrId], () => fetch(`https://pokeapi.co/api/v2/pokemon-species/${nameOrId}`).then((r) => r.json()), { retry: 2, staleTime: Infinity });
   const species = speciesQuery.data;
 
   const versionQuery = useQuery(['version', activeVersion], () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => r.json()), { retry: 2, staleTime: Infinity });
@@ -76,6 +76,8 @@ function PokemonDetailsPage() {
   }
 
   const evolutionChainUrl = species?.evolution_chain?.url;
+  const captureRate = species?.capture_rate;
+  const habitat = species?.habitat?.name.replaceAll('-', ' ');
 
   return (
     <Grid container spacing={2} sx={{ mt: 12 }}>
@@ -89,7 +91,7 @@ function PokemonDetailsPage() {
         />
         <Card sx={{ boxShadow: '0 5px 10px #d0efef' }}>
           <CardContent>
-            {pokemonQuery.isLoading ? <Skeleton variant="rectangular" width="110%" height={250} sx={{ m: -2, mb: 2 }} />
+            {pokemonQuery.isLoading ? <Skeleton animation="wave" variant="rectangular" width="110%" height={250} sx={{ m: -2, mb: 2 }} />
               : (
                 <Box sx={{
                   m: -2, mb: 2, background: species ? species?.color?.name : 'silver', height: '250px',
@@ -97,24 +99,24 @@ function PokemonDetailsPage() {
                 />
               )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              {pokemonQuery.isLoading ? <Skeleton variant="text" width="70%" height={40} />
+              {pokemonQuery.isLoading ? <Skeleton animation="wave" variant="text" width="70%" height={40} />
                 : (
                   <Typography sx={{ m: 0, textTransform: 'capitalize', mb: 1 }} gutterBottom variant="h4" component="div">
                     {name}
                   </Typography>
                 )}
               <Box sx={{ minWidth: '96px', display: 'flex', justifyContent: 'end' }}>
-                {pokemonQuery.isLoading ? <Skeleton variant="circular" width={40} height={40} />
+                {pokemonQuery.isLoading ? <Skeleton animation="wave" variant="circular" width={40} height={40} />
                   : types?.map((el: any) => <PokemonTypeBadge key={el.type.name} type={el.type.name} />)}
               </Box>
             </Box>
             <Box sx={{ display: 'flex', mt: 2 }}>
               {pokemonQuery.isLoading ? (
                 <>
-                  <Skeleton variant="text" width="40px" height="60px" />
+                  <Skeleton animation="wave" variant="text" width="40px" height="60px" />
                   <Box width="100%" sx={{ ml: 2, mt: 1 }}>
-                    <Skeleton variant="text" width="100%" />
-                    <Skeleton variant="text" width="70%" />
+                    <Skeleton animation="wave" variant="text" width="100%" />
+                    <Skeleton animation="wave" variant="text" width="70%" />
                   </Box>
                 </>
               )
@@ -129,7 +131,7 @@ function PokemonDetailsPage() {
                 )}
             </Box>
             {
-              pokemonQuery.isLoading ? <Skeleton variant="text" width="100%" height={60} />
+              pokemonQuery.isLoading ? <Skeleton animation="wave" variant="text" width="100%" height={60} />
                 : availableVersions?.length && availableVersions.includes(activeVersion) && (
                   <FormControl sx={{ mt: 2 }} fullWidth>
                     <InputLabel>Game version</InputLabel>
@@ -155,33 +157,13 @@ function PokemonDetailsPage() {
         <PokedexKeyboardNavigation next={goToNextPokemon} prev={goToPreviousPokemon} />
       </Grid>
       <Grid item xs={12} md={6} lg={8}>
-        <p>
-          Height:
-          {' '}
-          {height / 10}
-          m
-        </p>
-        <p>
-          Weight:
-          {' '}
-          {weight / 10}
-          kg
-        </p>
-        <p>
-          Base Experience:
-          {' '}
-          {baseExperience}
-        </p>
-        <p>
-          Capture Rate:
-          {' '}
-          {species?.capture_rate}
-        </p>
-        <p>
-          Habitat:
-          {' '}
-          {species?.habitat?.name}
-        </p>
+        <PokemonOverview
+          height={height}
+          weight={weight}
+          baseExperience={baseExperience}
+          captureRate={captureRate}
+          habitat={habitat}
+        />
         <PokemonAbilities abilities={abilities} versionGroup={versionGroupName} />
         <PokemonStats stats={stats} />
         {evolutionChainUrl && <PokemonEvolutionGraph evolutionChainUrl={evolutionChainUrl} name={name} />}
