@@ -21,12 +21,33 @@ function PokedexPage() {
           <PokemonCard key={pokemon?.name} name={pokemon?.name} />
         ))}
       </Grid>
-      <Box sx={{
-        pt: 3, mb: 4, display: 'flex', justifyContent: 'center', width: '100%',
-      }}
+      <Box
+        sx={{
+          pt: 3,
+          mb: 4,
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+        }}
       >
-        {data?.previous && <Button onClick={() => { setParams(previous); }}>Prev</Button>}
-        {data?.next && <Button onClick={() => { setParams(next); }}>Next</Button>}
+        {data?.previous && (
+          <Button
+            onClick={() => {
+              setParams(previous);
+            }}
+          >
+            Prev
+          </Button>
+        )}
+        {data?.next && (
+          <Button
+            onClick={() => {
+              setParams(next);
+            }}
+          >
+            Next
+          </Button>
+        )}
       </Box>
     </>
   );

@@ -15,11 +15,16 @@ interface PokedexKeyboardNavigationProps {
   prev: () => void;
 }
 
-const Kbd = ({ children }: PropsWithChildren) => <kbd className={styles.kbd}>{children}</kbd>;
+const Kbd = ({ children }: PropsWithChildren) => (
+  <kbd className={styles.kbd}>{children}</kbd>
+);
 
 function PokedexKeyboardNavigation(props: PokedexKeyboardNavigationProps) {
   const navigate = useNavigate();
-  const [hideHelp, setHideHelp] = useLocalStorage('hidePokedexNavigationHelp', false);
+  const [hideHelp, setHideHelp] = useLocalStorage(
+    'hidePokedexNavigationHelp',
+    false,
+  );
   const [showHelp, setShowHelp] = useState(!hideHelp);
   const { next, prev } = props;
 
@@ -85,7 +90,6 @@ function PokedexKeyboardNavigation(props: PokedexKeyboardNavigationProps) {
         </Alert>
       </Collapse>
     </Box>
-
   );
 }
 

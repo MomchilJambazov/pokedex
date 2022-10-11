@@ -35,35 +35,58 @@ function PokemonTypeBadge({ type }: PokemonTypeBadgeProps) {
 
   const renderIcon = () => {
     switch (type) {
-      case 'bug': return <img src={BugIcon} width="48px" alt={type} />;
-      case 'dragon': return <img src={DragonIcon} width="48px" alt={type} />;
-      case 'fairy': return <img src={FairyIcon} width="48px" alt={type} />;
-      case 'ghost': return <img src={GhostIcon} width="48px" alt={type} />;
-      case 'fight': return <img src={FightIcon} width="48px" alt={type} />;
-      case 'fighting': return <img src={FightIcon} width="48px" alt={type} />;
-      case 'dark': return <img src={DarkIcon} width="48px" alt={type} />;
-      case 'flying': return <img src={FlyingIcon} width="48px" alt={type} />;
-      case 'poison': return <img src={PoisonIcon} width="48px" alt={type} />;
-      case 'fire': return <img src={FireIcon} width="48px" alt={type} />;
-      case 'ice': return <img src={IceIcon} width="48px" alt={type} />;
-      case 'psychic': return <img src={PsychicIcon} width="48px" alt={type} />;
-      case 'rock': return <img src={RockIcon} width="48px" alt={type} />;
-      case 'steel': return <img src={SteelIcon} width="48px" alt={type} />;
-      case 'grass': return <img src={GrassIcon} width="48px" alt={type} />;
-      case 'ground': return <img src={GroundIcon} width="48px" alt={type} />;
-      case 'electric': return <img src={ElectricIcon} width="48px" alt={type} />;
-      case 'normal': return <img src={NormalIcon} width="48px" alt={type} />;
-      case 'water': return <img src={WaterIcon} width="48px" alt={type} />;
+      case 'bug':
+        return <img src={BugIcon} width="48px" alt={type} />;
+      case 'dragon':
+        return <img src={DragonIcon} width="48px" alt={type} />;
+      case 'fairy':
+        return <img src={FairyIcon} width="48px" alt={type} />;
+      case 'ghost':
+        return <img src={GhostIcon} width="48px" alt={type} />;
+      case 'fight':
+        return <img src={FightIcon} width="48px" alt={type} />;
+      case 'fighting':
+        return <img src={FightIcon} width="48px" alt={type} />;
+      case 'dark':
+        return <img src={DarkIcon} width="48px" alt={type} />;
+      case 'flying':
+        return <img src={FlyingIcon} width="48px" alt={type} />;
+      case 'poison':
+        return <img src={PoisonIcon} width="48px" alt={type} />;
+      case 'fire':
+        return <img src={FireIcon} width="48px" alt={type} />;
+      case 'ice':
+        return <img src={IceIcon} width="48px" alt={type} />;
+      case 'psychic':
+        return <img src={PsychicIcon} width="48px" alt={type} />;
+      case 'rock':
+        return <img src={RockIcon} width="48px" alt={type} />;
+      case 'steel':
+        return <img src={SteelIcon} width="48px" alt={type} />;
+      case 'grass':
+        return <img src={GrassIcon} width="48px" alt={type} />;
+      case 'ground':
+        return <img src={GroundIcon} width="48px" alt={type} />;
+      case 'electric':
+        return <img src={ElectricIcon} width="48px" alt={type} />;
+      case 'normal':
+        return <img src={NormalIcon} width="48px" alt={type} />;
+      case 'water':
+        return <img src={WaterIcon} width="48px" alt={type} />;
       default:
         return <ViewInArIcon width="48px" />;
     }
   };
 
   return (
-    <Tooltip arrow sx={{ p: 0, m: 0 }} title={<Typography sx={{ textTransform: 'capitalize' }}>{type}</Typography>}>
-      <IconButton onClick={handleClick}>
-        {renderIcon()}
-      </IconButton>
+    <Tooltip
+      arrow
+      sx={{ p: 0, m: 0 }}
+      title={
+        <Typography sx={{ textTransform: 'capitalize' }}>{type}</Typography>
+      }
+    >
+      <IconButton onClick={handleClick}>{renderIcon()}</IconButton>
     </Tooltip>
   );
 }

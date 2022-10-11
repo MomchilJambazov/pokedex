@@ -10,7 +10,7 @@ import usePokemon from '../../hooks/usePokemon';
 import PokemonTypeBadge from '../PokemonTypeBadge';
 
 export interface PokemonCardProps {
-  name: string,
+  name: string;
 }
 
 function PokemonCard({ name }: PokemonCardProps) {
@@ -30,36 +30,60 @@ function PokemonCard({ name }: PokemonCardProps) {
           {isLoading ? (
             <>
               <Box sx={{ p: 2, width: '100%' }}>
-                <Skeleton variant="text" sx={{ fontSize: '1.75rem' }} width="100%" animation="wave" />
+                <Skeleton
+                  variant="text"
+                  sx={{ fontSize: '1.75rem' }}
+                  width="100%"
+                  animation="wave"
+                />
                 <Skeleton width="20%" animation="wave" />
                 <br />
-                <Skeleton variant="circular" width={32} height={32} animation="wave" />
-              </Box>
-              <Skeleton animation="wave" variant="rectangular" width={180} height={140} />
-            </>
-          )
-            : (
-              <>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <CardContent sx={{ flex: '1 0 auto' }}>
-                    <Typography sx={{ textTransform: 'capitalize' }} component="div" variant="h5">
-                      {data?.name}
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" component="div">
-                      #
-                      {data?.id}
-                    </Typography>
-                    {data?.types?.map((el: any) => <PokemonTypeBadge key={el.type.name} type={el.type.name} />)}
-                  </CardContent>
-                </Box>
-                <CardMedia
-                  component="img"
-                  sx={{ width: 151 }}
-                  image={image}
-                  alt={name}
+                <Skeleton
+                  variant="circular"
+                  width={32}
+                  height={32}
+                  animation="wave"
                 />
-              </>
-            )}
+              </Box>
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={180}
+                height={140}
+              />
+            </>
+          ) : (
+            <>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flex: '1 0 auto' }}>
+                  <Typography
+                    sx={{ textTransform: 'capitalize' }}
+                    component="div"
+                    variant="h5"
+                  >
+                    {data?.name}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    color="text.secondary"
+                    component="div"
+                  >
+                    #
+                    {data?.id}
+                  </Typography>
+                  {data?.types?.map((el: any) => (
+                    <PokemonTypeBadge key={el.type.name} type={el.type.name} />
+                  ))}
+                </CardContent>
+              </Box>
+              <CardMedia
+                component="img"
+                sx={{ width: 151 }}
+                image={image}
+                alt={name}
+              />
+            </>
+          )}
         </Card>
       </Link>
     </Grid>

@@ -13,17 +13,22 @@ import MenuItem from '@mui/material/MenuItem';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Logo from '../../static/pokemon-logo.svg';
 
-const menuItems = [{ url: '/pokedex', label: 'Pokedex' }, { url: '/add-pokemon', label: 'Add Pokemon' }];
+const menuItems = [
+  { url: '/pokedex', label: 'Pokedex' },
+  { url: '/add-pokemon', label: 'Add Pokemon' },
+];
 
 function Header() {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+    null,
+  );
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
 
-  const handleCloseNavMenu = (url:string) => {
+  const handleCloseNavMenu = (url: string) => {
     setAnchorElNav(null);
     navigate(url);
   };
@@ -31,7 +36,10 @@ function Header() {
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Toolbar
+          disableGutters
+          sx={{ display: 'flex', justifyContent: 'space-between' }}
+        >
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -69,7 +77,9 @@ function Header() {
             </Menu>
           </Box>
 
-          <Link to="/pokedex"><img src={Logo} width="160px" alt="Pokemon Logo" /></Link>
+          <Link to="/pokedex">
+            <img src={Logo} width="160px" alt="Pokemon Logo" />
+          </Link>
 
           <Box sx={{ flexGrow: 1, ml: 4, display: { xs: 'none', md: 'flex' } }}>
             {menuItems.map(({ url, label }) => (
@@ -84,7 +94,11 @@ function Header() {
           </Box>
 
           <Link to="/favorites">
-            <IconButton color="primary" aria-label="favorites" component="label">
+            <IconButton
+              color="primary"
+              aria-label="favorites"
+              component="label"
+            >
               <FavoriteIcon htmlColor="white" />
             </IconButton>
           </Link>

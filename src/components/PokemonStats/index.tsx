@@ -8,29 +8,53 @@ import Paper from '@mui/material/Paper';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 
-export default function PokemonStats({ stats }: {stats: any}) {
+export default function PokemonStats({ stats }: { stats: any }) {
   if (!stats) return null;
 
   // Formulas taken from wiki (https://pokemon.fandom.com/wiki/Statistics), max IV value 31, max EV value is 255
-  function computeMinHpLimit(baseStat:number) {
-    return Math.floor(Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 100 + 10);
+  function computeMinHpLimit(baseStat: number) {
+    return Math.floor(
+      Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100)
+        + 100
+        + 10,
+    );
   }
-  function computeMaxHpLimit(baseStat:number) {
-    return Math.floor(Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 100 + 10);
+  function computeMaxHpLimit(baseStat: number) {
+    return Math.floor(
+      Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100)
+        + 100
+        + 10,
+    );
   }
-  function computeMinStatLimit(baseStat:number) {
-    return Math.floor((Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 5) * 0.9);
+  function computeMinStatLimit(baseStat: number) {
+    return Math.floor(
+      (Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 5)
+        * 0.9,
+    );
   }
-  function computeMaxStatLimit(baseStat:number) {
-    return Math.floor((Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 5) * 1.1);
+  function computeMaxStatLimit(baseStat: number) {
+    return Math.floor(
+      (Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100)
+        + 5)
+        * 1.1,
+    );
   }
 
-  const deriveMinLimit = (statName:string, baseValue:number) => (statName === 'hp' ? computeMinHpLimit(baseValue) : computeMinStatLimit(baseValue));
-  const deriveMaxLimit = (statName:string, baseValue:number) => (statName === 'hp' ? computeMaxHpLimit(baseValue) : computeMaxStatLimit(baseValue));
+  const deriveMinLimit = (statName: string, baseValue: number) => (statName === 'hp'
+    ? computeMinHpLimit(baseValue)
+    : computeMinStatLimit(baseValue));
+  const deriveMaxLimit = (statName: string, baseValue: number) => (statName === 'hp'
+    ? computeMaxHpLimit(baseValue)
+    : computeMaxStatLimit(baseValue));
   return (
     <>
-      <Typography sx={{ mt: 3, mb: 1 }} variant="h6">Base Stats</Typography>
-      <TableContainer component={Paper} sx={{ boxShadow: '0 5px 10px #d0efef' }}>
+      <Typography sx={{ mt: 3, mb: 1 }} variant="h6">
+        Base Stats
+      </Typography>
+      <TableContainer
+        component={Paper}
+        sx={{ boxShadow: '0 5px 10px #d0efef' }}
+      >
         <Table size="small" aria-label="a dense table">
           <TableFooter sx={{ background: '#e7ecf0' }}>
             <TableRow>
@@ -39,7 +63,10 @@ export default function PokemonStats({ stats }: {stats: any}) {
               </TableCell>
               <TableCell>
                 <b>
-                  {stats.reduce((acc:number, stat: any) => acc + stat.base_stat, 0)}
+                  {stats.reduce(
+                    (acc: number, stat: any) => acc + stat.base_stat,
+                    0,
+                  )}
                 </b>
               </TableCell>
               <TableCell />
@@ -53,13 +80,27 @@ export default function PokemonStats({ stats }: {stats: any}) {
                 key={name}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-                <TableCell sx={{ textTransform: 'capitalize', width: '140px' }} component="th" scope="row">
+                <TableCell
+                  sx={{ textTransform: 'capitalize', width: '140px' }}
+                  component="th"
+                  scope="row"
+                >
                   {name.replaceAll('-', ' ')}
                 </TableCell>
                 <TableCell sx={{ width: '40px' }}>{baseStat}</TableCell>
-                <TableCell><LinearProgress sx={{ height: '15px' }} variant="determinate" value={(baseStat / deriveMaxLimit(name, baseStat)) * 100} /></TableCell>
-                <TableCell sx={{ width: '40px' }}>{deriveMinLimit(name, baseStat)}</TableCell>
-                <TableCell sx={{ width: '40px' }}>{deriveMaxLimit(name, baseStat)}</TableCell>
+                <TableCell>
+                  <LinearProgress
+                    sx={{ height: '15px' }}
+                    variant="determinate"
+                    value={(baseStat / deriveMaxLimit(name, baseStat)) * 100}
+                  />
+                </TableCell>
+                <TableCell sx={{ width: '40px' }}>
+                  {deriveMinLimit(name, baseStat)}
+                </TableCell>
+                <TableCell sx={{ width: '40px' }}>
+                  {deriveMaxLimit(name, baseStat)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
