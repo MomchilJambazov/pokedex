@@ -53,8 +53,8 @@ export default function PokemonOverview({
 }: PokemonOverviewProps) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-      <MiniCard label="Height" value={height} />
-      <MiniCard label="Weight" value={weight} />
+      <MiniCard label="Height" value={height ? `${height / 10}m` : height} />
+      <MiniCard label="Weight" value={weight ? `${weight / 10}kg` : weight} />
       <MiniCard label="Base XP" value={baseExperience} />
       <MiniCard label="Capture rate" value={captureRate} />
       <MiniCard label="Habitat" value={habitat} />

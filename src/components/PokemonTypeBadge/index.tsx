@@ -24,13 +24,16 @@ import WaterIcon from '../../static/pokemon-type-icons/water.svg';
 
 interface PokemonTypeBadgeProps {
   type: string;
+  redirect?: boolean;
 }
 
-function PokemonTypeBadge({ type }: PokemonTypeBadgeProps) {
+function PokemonTypeBadge({ type, redirect }: PokemonTypeBadgeProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/pokedex?type=${type}`);
+    if (redirect) {
+      navigate(`/pokedex?type=${type}`);
+    }
   };
 
   const renderIcon = () => {
@@ -90,5 +93,9 @@ function PokemonTypeBadge({ type }: PokemonTypeBadgeProps) {
     </Tooltip>
   );
 }
+
+PokemonTypeBadge.defaultProps = {
+  redirect: false,
+};
 
 export default PokemonTypeBadge;
