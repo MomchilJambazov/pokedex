@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,16 +12,24 @@ export default function PokemonStats({ stats }: {stats: any}) {
   if (!stats) return null;
 
   // Formulas taken from wiki (https://pokemon.fandom.com/wiki/Statistics), max IV value 31, max EV value is 255
-  const computeMinHpLimit = (baseStat:number) => Math.floor(Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 100 + 10);
-  const computeMaxHpLimit = (baseStat:number) => Math.floor(Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 100 + 10);
-  const computeMinStatLimit = (baseStat:number) => Math.floor((Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 5) * 0.9);
-  const computeMaxStatLimit = (baseStat:number) => Math.floor((Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 5) * 1.1);
+  function computeMinHpLimit(baseStat:number) {
+    return Math.floor(Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 100 + 10);
+  }
+  function computeMaxHpLimit(baseStat:number) {
+    return Math.floor(Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 100 + 10);
+  }
+  function computeMinStatLimit(baseStat:number) {
+    return Math.floor((Math.floor(0.01 * (2 * baseStat + 0 + Math.floor(0.25 * 0)) * 100) + 5) * 0.9);
+  }
+  function computeMaxStatLimit(baseStat:number) {
+    return Math.floor((Math.floor(0.01 * (2 * baseStat + 31 + Math.floor(0.25 * 255)) * 100) + 5) * 1.1);
+  }
 
   const deriveMinLimit = (statName:string, baseValue:number) => (statName === 'hp' ? computeMinHpLimit(baseValue) : computeMinStatLimit(baseValue));
   const deriveMaxLimit = (statName:string, baseValue:number) => (statName === 'hp' ? computeMaxHpLimit(baseValue) : computeMaxStatLimit(baseValue));
   return (
     <>
-      <Typography sx={{ mt: 3 }} variant="h6">Base Stats</Typography>
+      <Typography sx={{ mt: 3, mb: 1 }} variant="h6">Base Stats</Typography>
       <TableContainer component={Paper} sx={{ boxShadow: '0 5px 10px #d0efef' }}>
         <Table size="small" aria-label="a dense table">
           <TableFooter sx={{ background: '#e7ecf0' }}>

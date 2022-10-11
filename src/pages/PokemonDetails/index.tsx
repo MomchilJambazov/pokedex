@@ -16,6 +16,7 @@ import Box from '@mui/material/Box';
 import PokedexKeyboardNavigation from '../../components/PokedexKeyboardNavigation';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 import PokemonStats from '../../components/PokemonStats';
+import PokemonAbilities from '../../components/PokemonAbilities';
 import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
 import usePokemon from '../../hooks/usePokemon';
 
@@ -181,6 +182,7 @@ function PokemonDetailsPage() {
           {' '}
           {species?.habitat?.name}
         </p>
+        <PokemonAbilities abilities={abilities} versionGroup={versionGroupName} />
         <PokemonStats stats={stats} />
         {evolutionChainUrl && <PokemonEvolutionGraph evolutionChainUrl={evolutionChainUrl} name={name} />}
       </Grid>
