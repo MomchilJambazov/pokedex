@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -15,6 +15,7 @@ import AbilityAutocomplete from '../../components/Inputs/AbilityAutocomplete';
 import NumberInput from '../../components/Inputs/NumberInput';
 import PokemonTypeSelect from '../../components/Inputs/PokemonTypeSelect';
 import usePokemon from '../../hooks/usePokemon';
+import { DefaultValues, Pokemon } from '../../app/types';
 import {
   POKEMON_HABITATS,
   POKEMON_COLORS,
@@ -57,7 +58,7 @@ const AddPokemonPage = () => {
   const pokemonQuery = usePokemon('');
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [showSuccessAlert, setSuccessAlert] = useState(false);
-  const state:any = useSelector((state) => state);
+  const pokemonList = useSelector((state:any) => state?.pokedex?.pokemonList);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const lastCreatedPokemonId = useRef<number|null>(null);
@@ -65,25 +66,70 @@ const AddPokemonPage = () => {
   const generateId = () => {
     // TODO: This id generation does not check for id collision with other custom pokemon ids
     const pokemonCount = pokemonQuery.data.count || FALLBACK_POKEMON_COUNT; // fallback value for pokemon count retrieved from api
-    const customPokemonCount = state.pokedex.pokemonList.length;
+    const customPokemonCount = pokemonList?.length;
     const incrementedId = pokemonCount + customPokemonCount + 1;
     return incrementedId;
   };
 
-  const onSubmit = (data: any) => {
+  const mapFormDataToPokemonContract = (data: DefaultValues) => {
     const newPokemonId = generateId();
-    const pokemonData = {
+    lastCreatedPokemonId.current = newPokemonId;
+
+    const pokemonAbilities = [];
+    if (data.ability_1) pokemonAbilities.push({ ability: { name: data.ability_1 } });
+    if (data.ability_2) pokemonAbilities.push({ ability: { name: data.ability_2 } });
+    if (data.ability_3) pokemonAbilities.push({ ability: { name: data.ability_3 } });
+
+    const pokemon: Pokemon = {
       id: newPokemonId,
-      ...data,
+      name: data.name,
+      height: data.height * 10,
+      weight: data.weight * 10,
+      base_experience: data.base_experience,
+      evolution_chain: null,
+      capture_rate: data.capture_rate,
+      stats: [{
+        base_stat: data.hp,
+        stat: { name: 'hp' },
+      },
+      {
+        base_stat: data.speed,
+        stat: { name: 'speed' },
+      },
+      {
+        base_stat: data.defence,
+        stat: { name: 'defence' },
+      },
+      {
+        base_stat: data.attack,
+        stat: { name: 'attack' },
+      },
+      {
+        base_stat: data.special_attack,
+        stat: { name: 'special_attack' },
+      },
+      {
+        base_stat: data.special_defence,
+        stat: { name: 'special_defence' },
+      }],
+      types: [{ slot: 1, type: { name: data.type_1 } }, { slot: 2, type: { name: data.type_2 } }],
+      abilities: pokemonAbilities,
+      sprites: { other: { home: { front_default: data.avatar } } },
+      flavor_text_entries: [{ flavor_text: data.short_description, language: { name: 'en' }, version: { name: 'red' } }],
+      habitat: { name: data.habitat },
     };
+    return pokemon;
+  };
+
+  const onSubmit:SubmitHandler<typeof defaultValues> = (data) => {
+    const newPokemon = mapFormDataToPokemonContract(data as unknown as DefaultValues);
     dispatch({
       type: 'pokemons/add',
-      payload: pokemonData,
+      payload: newPokemon,
     });
     setSuccessAlert(true);
     setLastUpdate(Date.now());
     reset();
-    lastCreatedPokemonId.current = newPokemonId;
   };
 
   const handleRedirect = () => {

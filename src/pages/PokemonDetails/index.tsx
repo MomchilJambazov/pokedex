@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Grid from '@mui/material/Grid';
@@ -22,6 +23,7 @@ import usePokemon from '../../hooks/usePokemon';
 import useSpecies from '../../hooks/useSpecies';
 import useGameVersion from '../../hooks/useGameVersion';
 import { DEFAULT_GAME_VERSION } from '../../app/constants';
+
 import {
   AnyObject, NestedObject, ShortDescription, Pokemon, PokemonType,
 } from '../../app/types';
@@ -35,14 +37,18 @@ function PokemonDetailsPage() {
   const speciesQuery = useSpecies(nameOrId);
   const versionQuery = useGameVersion(activeVersion);
   const versionGroupName = versionQuery?.data?.version_group.name;
+  const customPokemonList: Pokemon[] = useSelector((state:any) => state?.pokedex?.pokemonList);
 
-  const pokemonContract = {
+  // eslint-disable-next-line max-len
+  const customPokemon = customPokemonList.find(({ name, id }) => nameOrId === name || nameOrId === id?.toString()) || null;
+
+  const pokemonData = customPokemon || {
     ...speciesQuery.data,
     ...pokemonQuery.data,
   };
 
-  const hasError = pokemonQuery.isError || speciesQuery.isError;
-  const isLoading = pokemonQuery.isLoading || speciesQuery.isLoading;
+  const hasError = (pokemonQuery.isError || speciesQuery.isError) && !customPokemon;
+  const isLoading = (pokemonQuery.isLoading || speciesQuery.isLoading) && !customPokemon;
 
   const {
     name,
@@ -58,18 +64,17 @@ function PokemonDetailsPage() {
     evolution_chain: evolutionChain,
     capture_rate: captureRate,
     habitat,
-  }: Pokemon = pokemonContract;
+  }: Pokemon = pokemonData;
 
   const { url: evolutionChainUrl } = evolutionChain || {};
   const pokemonHabitat = habitat ? habitat?.name.replaceAll('-', ' ') : habitat;
   const homePicture = sprites?.other?.home.front_default;
-  const officialArtwork = sprites?.other?.['official-artwork'].front_default;
+  const officialArtwork = sprites?.other?.['official-artwork']?.front_default;
   const avatar = homePicture || officialArtwork;
 
   const { versions: spritesByGenerations } = sprites || {};
 
   const flattenObject = (obj:NestedObject) => {
-    // eslint-disable-next-line max-len
     const flat = Object.values(obj).reduce((acc: AnyObject, el: AnyObject) => ({ ...acc, ...el }));
     return flat;
   };
@@ -137,8 +142,8 @@ function PokemonDetailsPage() {
                 sx={{
                   m: -2,
                   mb: 2,
-                  background: pokemonContract
-                    ? pokemonContract?.color?.name
+                  background: pokemonData
+                    ? pokemonData?.color?.name
                     : 'silver',
                   height: '250px',
                 }}
@@ -209,8 +214,8 @@ function PokemonDetailsPage() {
                     variant="body2"
                     color="text.secondary"
                   >
-                    {pokemonContract
-                      && pokemonContract?.flavor_text_entries?.map(
+                    {pokemonData
+                      && pokemonData?.flavor_text_entries?.map(
                         (entry: any) => entry.language.name === 'en'
                           && entry.version.name === activeVersion
                           && entry.flavor_text,

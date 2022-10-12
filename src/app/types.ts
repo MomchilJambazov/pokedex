@@ -1,6 +1,6 @@
 export interface ApiItem {
     name: string,
-    url: string,
+    url?: string,
 }
 
 export interface DefaultValues {
@@ -48,13 +48,13 @@ export interface PokemonType {
 
 export interface PokemonStat {
     base_stat: number,
-    effort: number,
+    effort?: number,
     stat: ApiItem,
 }
 
 export interface PokemonAbility {
-    slot: number,
-    isHidden: boolean,
+    slot?: number,
+    isHidden?: boolean,
     ability: ApiItem,
 }
 
@@ -73,7 +73,12 @@ export interface Pokemon {
     base_experience: number,
     abilities: PokemonAbility[],
     flavor_text_entries: ShortDescription[],
-    evolution_chain: ApiItem,
+    evolution_chain: ApiItem | null,
     capture_rate: number,
     habitat?: ApiItem,
+}
+
+export interface Action {
+    type: string | Pokemon,
+    payload: string,
 }
