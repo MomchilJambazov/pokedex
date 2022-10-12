@@ -4,9 +4,8 @@ import {
 import { Controller } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import SnackbarAlert from '../../components/SnackbarAlert';
 
 const fileToDataUri = (file:any) => new Promise((resolve) => {
   const reader = new FileReader();
@@ -113,20 +112,12 @@ const ImageUpload = ({
           <TextField {...field} type="hidden" sx={{ opacity: 0 }} />
         )}
       />
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
+      <SnackbarAlert
         open={showAlert}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-          File size too big, maximum 200kb images allowed!
-        </Alert>
-      </Snackbar>
-
+        severity="error"
+        setOpen={setAlert}
+        message="File size too big, maximum 200kb images allowed!"
+      />
     </>
   );
 };

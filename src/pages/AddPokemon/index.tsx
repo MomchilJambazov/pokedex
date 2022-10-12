@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import Typography from '@mui/material/Typography';
@@ -15,6 +16,7 @@ import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 import ImageUpload from './ImageUploader';
+import SnackbarAlert from '../../components/SnackbarAlert';
 
 const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'fighting', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
 
@@ -152,8 +154,10 @@ const AddPokemonPage = () => {
     control, setValue, reset, handleSubmit,
   } = useForm({ defaultValues });
   const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [showSuccessAlert, setSuccessAlert] = useState(false);
 
   const state = useSelector((state) => state);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const onSubmit = (data: any) => {
@@ -161,8 +165,14 @@ const AddPokemonPage = () => {
       type: 'pokemons/add',
       payload: data,
     });
+    setSuccessAlert(true);
     setLastUpdate(Date.now());
     reset();
+  };
+
+  const handleRedirect = () => {
+    // TODO pass id
+    navigate('/pokemon/1');
   };
 
   return (
@@ -214,6 +224,17 @@ const AddPokemonPage = () => {
         </Grid>
         <Button variant="contained" size="large" type="submit">Create</Button>
       </form>
+      <SnackbarAlert
+        open={showSuccessAlert}
+        severity="success"
+        setOpen={setSuccessAlert}
+        message="Pokemon created successfully!"
+        action={(
+          <Button onClick={handleRedirect} color="inherit" size="small">
+            Visit page
+          </Button>
+        )}
+      />
     </>
   );
 };
