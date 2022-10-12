@@ -1,34 +1,31 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Slider from '@mui/material/Slider';
-import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
-import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 import ImageUpload from './ImageUploader';
 import SnackbarAlert from '../../components/SnackbarAlert';
+import SliderWithLabel from '../../components/Inputs/SliderWithLabel';
+import DropdownSelect from '../../components/Inputs/DropdownSelect';
+import AbilityAutocomplete from '../../components/Inputs/AbilityAutocomplete';
+import NumberInput from '../../components/Inputs/NumberInput';
+import PokemonTypeSelect from '../../components/Inputs/PokemonTypeSelect';
 import usePokemon from '../../hooks/usePokemon';
-
-const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
-const pokemonHabitats = ['grassland', 'forest', 'waters-edge', 'sea', 'cave', 'mountain', 'rough-terrain', 'urban', 'rare'];
-const pokemonColors = ['red', 'blue', 'yellow', 'green', 'black', 'brown', 'purple', 'gray', 'white', 'pink'];
-const MAX_WEIGHT_KG = 5000;
-const MAX_HEIGHT_M = 40;
-const MAX_CAPTURE_RATE = 100;
-const MAX_BASE_EXPERIENCE = 255;
-const MAX_POKEMON_NAME_LENGTH = 12;
-const MAX_POKEMON_SHORT_DESCRIPTION_LENGTH = 500;
-const FALLBACK_POKEMON_COUNT = 1200;
+import {
+  POKEMON_HABITATS,
+  POKEMON_COLORS,
+  MAX_WEIGHT_KG,
+  MAX_HEIGHT_M,
+  MAX_CAPTURE_RATE,
+  MAX_BASE_EXPERIENCE,
+  MAX_POKEMON_NAME_LENGTH,
+  MAX_POKEMON_SHORT_DESCRIPTION_LENGTH,
+  FALLBACK_POKEMON_COUNT,
+} from '../../app/constants';
 
 const defaultValues = {
   avatar: '',
@@ -51,203 +48,6 @@ const defaultValues = {
   ability_1: null,
   ability_2: null,
   ability_3: null,
-};
-interface DefaultValues {
-  avatar: string,
-  name: string,
-  height: number,
-  weight: number,
-  base_experience: number,
-  capture_rate: number,
-  habitat: string,
-  short_description: string,
-  color: string,
-  hp: number,
-  attack: number,
-  defence: number,
-  speed: number,
-  special_attack: number,
-  special_defence: number,
-  type_1: string,
-  type_2: string,
-  ability_1: string,
-  ability_2: string,
-  ability_3: string,
-}
-
-type FieldName = keyof DefaultValues;
-
-interface FieldProps { control:any, fieldName: FieldName; label: string; required?: boolean }
-
-function SliderWithLabel({
-  control, fieldName, label,
-}:FieldProps): JSX.Element {
-  return (
-    <Controller
-      name={fieldName}
-      control={control}
-      render={({ field }) => (
-        <Box sx={{ display: 'flex' }}>
-          <Box sx={{
-            textAlign: 'right', py: 1, pr: 3, whiteSpace: 'nowrap',
-          }}
-          >
-            {`${label}: ${field.value}`}
-          </Box>
-          <Slider
-            {...field}
-            valueLabelDisplay="auto"
-            max={255}
-            min={1}
-            step={1}
-          />
-        </Box>
-      )}
-    />
-  );
-}
-function PokemonTypeSelect({
-  control, fieldName, label, required,
-}:FieldProps): JSX.Element {
-  return (
-    <Controller
-      name={fieldName}
-      control={control}
-      render={({ field }) => (
-        <FormControl sx={{ mt: 1 }} fullWidth required={required}>
-          <InputLabel id={fieldName}>{label}</InputLabel>
-          <Select
-            labelId={fieldName}
-            label={label}
-            sx={{ height: 56, flexGrow: 1 }}
-            {...field}
-          >
-            <MenuItem key="none" value="">None</MenuItem>
-            {pokemonTypeOptions.map((type) => (
-              <MenuItem key={type} value={type}>
-                <PokemonTypeBadge type={type} />
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-    />
-  );
-}
-
-function AbilityAutocomplete({
-  control, fieldName, label, required,
-}:FieldProps): JSX.Element {
-  const abilitiesQuery = useQuery(
-    ['abilities'],
-    () => fetch('https://pokeapi.co/api/v2/ability?limit=1000').then((r) => r.json()),
-    { retry: 2, staleTime: Infinity },
-  );
-
-  const abilityOptions = abilitiesQuery?.data?.results.map(({ name }: {name: string}) => name) || [];
-  return (
-    <Controller
-      name={fieldName}
-      control={control}
-      render={({ field: { onChange, value } }) => (
-        <Autocomplete
-          disablePortal
-          onChange={(event, item) => {
-            onChange(item);
-          }}
-          value={value}
-          options={abilityOptions}
-          sx={{ flexGrow: 1 }}
-          renderInput={(params) => (
-            <TextField
-              label={label}
-              required={required}
-              {...params}
-            />
-          )}
-        />
-      )}
-    />
-  );
-}
-
-interface NumberInputProps {
-  control:any,
-  fieldName: FieldName;
-  label: string;
-  min: number,
-  max: number,
-  step: number,
-  type?: 'int' | 'float',
-  setValue: (a:FieldName, b:number) => void,
-}
-function DropdownSelect({
-  control, fieldName, label, required, options,
-}:FieldProps & {options: string[]}): JSX.Element {
-  return (
-    <Controller
-      name={fieldName}
-      control={control}
-      render={({ field }) => (
-        <FormControl sx={{ mt: 1 }} fullWidth required={required}>
-          <InputLabel id={fieldName}>{label}</InputLabel>
-          <Select
-            labelId={fieldName}
-            label={label}
-            sx={{ height: 56, flexGrow: 1 }}
-            {...field}
-          >
-            {!required && <MenuItem key="none" value="">None</MenuItem>}
-            {options.map((option) => (
-              <MenuItem sx={{ textTransform: 'capitalize' }} key={option} value={option}>
-                {option.replaceAll('-', ' ')}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-    />
-  );
-}
-
-DropdownSelect.defaultProps = {
-  required: false,
-};
-
-function NumberInput({
-  control, fieldName, label, min, max, step, setValue, type,
-}:NumberInputProps): JSX.Element {
-  return (
-    <Controller
-      name={fieldName}
-      control={control}
-      render={({ field }) => (
-        <TextField
-          required
-          type="number"
-          label={label}
-          fullWidth
-          variant="outlined"
-          {...field}
-          inputProps={{
-            min,
-            max,
-            step,
-          }}
-          onChange={(e) => {
-            let value = type === 'float' ? parseFloat(e.target.value) : parseInt(e.target.value, 10);
-            if (value > max) value = max;
-            if (value < min) value = min;
-            setValue(fieldName, value);
-          }}
-        />
-      )}
-    />
-  );
-}
-NumberInput.defaultProps = {
-  type: 'int',
 };
 
 const AddPokemonPage = () => {
@@ -342,8 +142,8 @@ const AddPokemonPage = () => {
               <NumberInput control={control} fieldName="capture_rate" label="Capture rate" min={1} max={MAX_CAPTURE_RATE} step={1} setValue={setValue} />
             </Box>
             <Box sx={{ display: 'flex', gap: '10px', my: 2 }}>
-              <DropdownSelect control={control} fieldName="color" label="Color" options={pokemonColors} required />
-              <DropdownSelect control={control} fieldName="habitat" label="Habitat" options={pokemonHabitats} />
+              <DropdownSelect control={control} fieldName="color" label="Color" options={POKEMON_COLORS} required />
+              <DropdownSelect control={control} fieldName="habitat" label="Habitat" options={POKEMON_HABITATS} />
             </Box>
             <Typography variant="h6">Types</Typography>
             <Box sx={{ display: 'flex', gap: '10px' }}>
@@ -382,18 +182,6 @@ const AddPokemonPage = () => {
       />
     </>
   );
-};
-
-SliderWithLabel.defaultProps = {
-  required: false,
-};
-
-PokemonTypeSelect.defaultProps = {
-  required: false,
-};
-
-AbilityAutocomplete.defaultProps = {
-  required: false,
 };
 
 export default AddPokemonPage;
