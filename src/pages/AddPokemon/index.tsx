@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import Typography from '@mui/material/Typography';
@@ -7,14 +9,32 @@ import MenuItem from '@mui/material/MenuItem';
 import Slider from '@mui/material/Slider';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
-import { useSelector, useDispatch } from 'react-redux';
-import { add } from '../../app/pokedexSlice';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
+import ImageUpload from './ImageUploader';
 
 const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'fighting', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
 
+const defaultValues = {
+  avatar: '',
+  name: '',
+  type_1: '',
+  type_2: '',
+  hp: 20,
+  attack: 20,
+  defence: 20,
+  speed: 20,
+  special_attack: 20,
+  special_defence: 20,
+  ability_1: null,
+  ability_2: null,
+  ability_3: null,
+};
 interface DefaultValues {
+  avatar: string,
   name: string,
   hp: number,
   attack: number,
@@ -43,7 +63,7 @@ function SliderWithLabel({
       render={({ field }) => (
         <Box sx={{ display: 'flex' }}>
           <Box sx={{
-            textAlign: 'right', py: 1, px: 3, whiteSpace: 'nowrap',
+            textAlign: 'right', py: 1, pr: 3, whiteSpace: 'nowrap',
           }}
           >
             {`${label}: ${field.value}`}
@@ -68,15 +88,16 @@ function PokemonTypeSelect({
       name={fieldName}
       control={control}
       render={({ field }) => (
-        <>
-          {label}
+        <FormControl sx={{ mt: 1 }} fullWidth>
+          <InputLabel id={fieldName}>{label}</InputLabel>
           <Select
-            placeholder="Type"
+            labelId={fieldName}
+            label={label}
             required={required}
-            sx={{ height: 56 }}
+            sx={{ height: 56, flexGrow: 1 }}
             {...field}
           >
-            <MenuItem key="select" value="">None</MenuItem>
+            <MenuItem key="none" value="">None</MenuItem>
             {pokemonTypeOptions.map((type) => (
               <MenuItem key={type} value={type}>
                 <PokemonTypeBadge type={type} />
@@ -84,7 +105,7 @@ function PokemonTypeSelect({
               </MenuItem>
             ))}
           </Select>
-        </>
+        </FormControl>
       )}
     />
   );
@@ -104,17 +125,20 @@ function AbilityAutocomplete({
     <Controller
       name={fieldName}
       control={control}
-      render={({ field }) => (
+      render={({ field: { onChange, value } }) => (
         <Autocomplete
           disablePortal
+          onChange={(event, item) => {
+            onChange(item);
+          }}
+          value={value}
           options={abilityOptions}
           sx={{ flexGrow: 1 }}
           renderInput={(params) => (
             <TextField
-              {...params}
               label={label}
               required={required}
-              {...field}
+              {...params}
             />
           )}
         />
@@ -124,23 +148,10 @@ function AbilityAutocomplete({
 }
 
 const AddPokemonPage = () => {
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      name: '',
-      type_1: '',
-      type_2: '',
-      hp: 20,
-      attack: 20,
-      defence: 20,
-      speed: 20,
-      special_attack: 20,
-      special_defence: 20,
-      ability_1: '',
-      ability_2: '',
-      ability_3: '',
-
-    },
-  });
+  const {
+    control, setValue, reset, handleSubmit,
+  } = useForm({ defaultValues });
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
@@ -150,6 +161,8 @@ const AddPokemonPage = () => {
       type: 'pokemons/add',
       payload: data,
     });
+    setLastUpdate(Date.now());
+    reset();
   };
 
   return (
@@ -158,35 +171,47 @@ const AddPokemonPage = () => {
         Add Pokemon
       </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Box sx={{ display: 'flex', gap: '10px' }}>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                required
-                label="Name"
-                fullWidth
-                variant="outlined"
-                {...field}
-              />
-            )}
-          />
-          <PokemonTypeSelect control={control} fieldName="type_1" label="Type(s)" required />
-          <PokemonTypeSelect control={control} fieldName="type_2" label="" />
-        </Box>
-        <SliderWithLabel control={control} fieldName="hp" label="HP" />
-        <SliderWithLabel control={control} fieldName="attack" label="Attack" />
-        <SliderWithLabel control={control} fieldName="defence" label="Defence" />
-        <SliderWithLabel control={control} fieldName="speed" label="Speed" />
-        <SliderWithLabel control={control} fieldName="special_attack" label="Special attack" />
-        <SliderWithLabel control={control} fieldName="special_defence" label="Special defence" />
-        <Box sx={{ display: 'flex', gap: '10px' }}>
-          <AbilityAutocomplete control={control} fieldName="ability_1" label="Ability 1" required />
-          <AbilityAutocomplete control={control} fieldName="ability_2" label="Ability 2" />
-          <AbilityAutocomplete control={control} fieldName="ability_3" label="Ability 3" />
-        </Box>
-
+        <Grid container spacing={5}>
+          <Grid item xs={6} md={4}>
+            <ImageUpload control={control} fieldName="avatar" setValue={setValue} lastUpdate={lastUpdate} />
+          </Grid>
+          <Grid item xs={6} md={8}>
+            <Typography variant="h6">Pokemon name</Typography>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  required
+                  label="Name"
+                  fullWidth
+                  variant="outlined"
+                  {...field}
+                />
+              )}
+            />
+            <Typography variant="h6">Types</Typography>
+            <Box sx={{ display: 'flex', gap: '10px' }}>
+              <PokemonTypeSelect control={control} fieldName="type_1" label="Type 1" required />
+              <PokemonTypeSelect control={control} fieldName="type_2" label="Type 2" />
+            </Box>
+            <Box sx={{ my: 2 }}>
+              <Typography variant="h6">Stats</Typography>
+              <SliderWithLabel control={control} fieldName="hp" label="HP" />
+              <SliderWithLabel control={control} fieldName="attack" label="Attack" />
+              <SliderWithLabel control={control} fieldName="defence" label="Defence" />
+              <SliderWithLabel control={control} fieldName="speed" label="Speed" />
+              <SliderWithLabel control={control} fieldName="special_attack" label="Special attack" />
+              <SliderWithLabel control={control} fieldName="special_defence" label="Special defence" />
+            </Box>
+            <Typography variant="h6">Abilities</Typography>
+            <Box sx={{ display: 'flex', gap: '10px' }}>
+              <AbilityAutocomplete control={control} fieldName="ability_1" label="Ability 1" required />
+              <AbilityAutocomplete control={control} fieldName="ability_2" label="Ability 2" />
+              <AbilityAutocomplete control={control} fieldName="ability_3" label="Ability 3" />
+            </Box>
+          </Grid>
+        </Grid>
         <Button variant="contained" size="large" type="submit">Create</Button>
       </form>
     </>
