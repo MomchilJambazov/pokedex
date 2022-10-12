@@ -90,13 +90,6 @@ const ImageUpload = ({
     setValue(fieldName, URI);
   }, [fieldName, URI, setValue]);
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setAlert(false);
-  };
-
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
