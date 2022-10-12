@@ -22,6 +22,13 @@ import usePokemon from '../../hooks/usePokemon';
 const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
 const pokemonHabitats = ['grassland', 'forest', 'waters-edge', 'sea', 'cave', 'mountain', 'rough-terrain', 'urban', 'rare'];
 const pokemonColors = ['red', 'blue', 'yellow', 'green', 'black', 'brown', 'purple', 'gray', 'white', 'pink'];
+const MAX_WEIGHT_KG = 5000;
+const MAX_HEIGHT_M = 40;
+const MAX_CAPTURE_RATE = 100;
+const MAX_BASE_EXPERIENCE = 255;
+const MAX_POKEMON_NAME_LENGTH = 12;
+const MAX_POKEMON_SHORT_DESCRIPTION_LENGTH = 500;
+const FALLBACK_POKEMON_COUNT = 1200;
 
 const defaultValues = {
   avatar: '',
@@ -256,7 +263,8 @@ const AddPokemonPage = () => {
   const lastCreatedPokemonId = useRef<number|null>(null);
 
   const generateId = () => {
-    const pokemonCount = pokemonQuery.data.count || 1200; // fallback value for pokemon count retrieved from api
+    // TODO: This id generation does not check for id collision with other custom pokemon ids
+    const pokemonCount = pokemonQuery.data.count || FALLBACK_POKEMON_COUNT; // fallback value for pokemon count retrieved from api
     const customPokemonCount = state.pokedex.pokemonList.length;
     const incrementedId = pokemonCount + customPokemonCount + 1;
     return incrementedId;
@@ -303,7 +311,7 @@ const AddPokemonPage = () => {
                   label="Name"
                   fullWidth
                   inputProps={{
-                    maxLength: 60,
+                    maxLength: MAX_POKEMON_NAME_LENGTH,
                   }}
                   variant="outlined"
                   {...field}
@@ -320,7 +328,7 @@ const AddPokemonPage = () => {
                   label="Short description"
                   fullWidth
                   inputProps={{
-                    maxLength: 500,
+                    maxLength: MAX_POKEMON_SHORT_DESCRIPTION_LENGTH,
                   }}
                   variant="outlined"
                   {...field}
@@ -328,10 +336,10 @@ const AddPokemonPage = () => {
               )}
             />
             <Box sx={{ display: 'flex', gap: '10px', mt: 3 }}>
-              <NumberInput control={control} fieldName="weight" label="Weight (kg)" min={0.1} max={5000} step={0.1} setValue={setValue} type="float" />
-              <NumberInput control={control} fieldName="height" label="Height (m)" min={0.1} max={50} step={0.1} setValue={setValue} type="float" />
-              <NumberInput control={control} fieldName="base_experience" label="Base experience" min={1} max={255} step={1} setValue={setValue} />
-              <NumberInput control={control} fieldName="capture_rate" label="Capture rate" min={1} max={100} step={1} setValue={setValue} />
+              <NumberInput control={control} fieldName="weight" label="Weight (kg)" min={0.1} max={MAX_WEIGHT_KG} step={0.1} setValue={setValue} type="float" />
+              <NumberInput control={control} fieldName="height" label="Height (m)" min={0.1} max={MAX_HEIGHT_M} step={0.1} setValue={setValue} type="float" />
+              <NumberInput control={control} fieldName="base_experience" label="Base experience" min={1} max={MAX_BASE_EXPERIENCE} step={1} setValue={setValue} />
+              <NumberInput control={control} fieldName="capture_rate" label="Capture rate" min={1} max={MAX_CAPTURE_RATE} step={1} setValue={setValue} />
             </Box>
             <Box sx={{ display: 'flex', gap: '10px', my: 2 }}>
               <DropdownSelect control={control} fieldName="color" label="Color" options={pokemonColors} required />
