@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
@@ -17,6 +17,7 @@ import Box from '@mui/material/Box';
 import PokemonTypeBadge from '../../components/PokemonTypeBadge';
 import ImageUpload from './ImageUploader';
 import SnackbarAlert from '../../components/SnackbarAlert';
+import usePokemon from '../../hooks/usePokemon';
 
 const pokemonTypeOptions = ['bug', 'dragon', 'fairy', 'ghost', 'fight', 'dark', 'flying', 'poison', 'fire', 'ice', 'psychic', 'rock', 'steel', 'grass', 'ground', 'electric', 'normal', 'water'];
 const pokemonHabitats = ['grassland', 'forest', 'waters-edge', 'sea', 'cave', 'mountain', 'rough-terrain', 'urban', 'rare'];
@@ -30,7 +31,6 @@ const defaultValues = {
   height: 1,
   weight: 10,
   base_experience: 50,
-  id: 9999,
   capture_rate: 50,
   habitat: '',
   short_description: '',
@@ -51,7 +51,6 @@ interface DefaultValues {
   height: number,
   weight: number,
   base_experience: number,
-  id: number,
   capture_rate: number,
   habitat: string,
   short_description: string,
@@ -248,26 +247,39 @@ const AddPokemonPage = () => {
   const {
     control, setValue, reset, handleSubmit,
   } = useForm({ defaultValues });
+  const pokemonQuery = usePokemon('');
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [showSuccessAlert, setSuccessAlert] = useState(false);
-
-  const state = useSelector((state) => state);
+  const state:any = useSelector((state) => state);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const lastCreatedPokemonId = useRef<number|null>(null);
+
+  const generateId = () => {
+    const pokemonCount = pokemonQuery.data.count || 1200; // fallback value for pokemon count retrieved from api
+    const customPokemonCount = state.pokedex.pokemonList.length;
+    const incrementedId = pokemonCount + customPokemonCount + 1;
+    return incrementedId;
+  };
 
   const onSubmit = (data: any) => {
+    const newPokemonId = generateId();
+    const pokemonData = {
+      id: newPokemonId,
+      ...data,
+    };
     dispatch({
       type: 'pokemons/add',
-      payload: data,
+      payload: pokemonData,
     });
     setSuccessAlert(true);
     setLastUpdate(Date.now());
     reset();
+    lastCreatedPokemonId.current = newPokemonId;
   };
 
   const handleRedirect = () => {
-    // TODO pass id
-    navigate('/pokemon/1');
+    navigate(`/pokemon/${lastCreatedPokemonId.current}`);
   };
 
   return (
@@ -354,11 +366,11 @@ const AddPokemonPage = () => {
         severity="success"
         setOpen={setSuccessAlert}
         message="Pokemon created successfully!"
-        action={(
+        action={lastCreatedPokemonId.current ? (
           <Button onClick={handleRedirect} color="inherit" size="small">
             Visit page
           </Button>
-        )}
+        ) : undefined}
       />
     </>
   );
