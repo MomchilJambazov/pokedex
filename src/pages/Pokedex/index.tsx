@@ -14,9 +14,14 @@ function PokedexPage() {
   const next = data?.next ? `?${data?.next.split('?')[1]}` : '';
   const previous = data?.previous ? `?${data?.previous.split('?')[1]}` : '';
 
+  const renderEmptyList = (numberOfElements:number) => (
+    new Array(numberOfElements).fill('').map(() => <PokemonCard key={Math.random()} isFetching name="" />)
+  );
+
   return (
     <>
       <Grid sx={{ mt: 4 }} container spacing={2}>
+        {!data && renderEmptyList(20)}
         {data?.results.map((pokemon: any) => (
           <PokemonCard key={pokemon?.name} name={pokemon?.name} />
         ))}
