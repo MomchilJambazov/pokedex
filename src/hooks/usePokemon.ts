@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-type Props = string | undefined;
+type Props = string | number | undefined;
 
 export default function usePokemon(queryParams: Props) {
   const queryInfo = useQuery(

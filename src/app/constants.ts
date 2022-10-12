@@ -8,3 +8,4 @@ export const MAX_BASE_EXPERIENCE = 255;
 export const MAX_POKEMON_NAME_LENGTH = 15;
 export const MAX_POKEMON_SHORT_DESCRIPTION_LENGTH = 500;
 export const FALLBACK_POKEMON_COUNT = 1200;
+export const DEFAULT_GAME_VERSION = 'red';

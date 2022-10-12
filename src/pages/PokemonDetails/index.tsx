@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Grid from '@mui/material/Grid';
@@ -20,15 +19,30 @@ import PokemonAbilities from '../../components/PokemonAbilities';
 import PokemonStats from '../../components/PokemonStats';
 import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
 import usePokemon from '../../hooks/usePokemon';
-
-const DEFAULT_GAME_VERSION = 'red';
+import useSpecies from '../../hooks/useSpecies';
+import useGameVersion from '../../hooks/useGameVersion';
+import { DEFAULT_GAME_VERSION } from '../../app/constants';
+import {
+  AnyObject, NestedObject, ShortDescription, Pokemon, PokemonType,
+} from '../../app/types';
 
 function PokemonDetailsPage() {
+  const navigate = useNavigate();
   const params = useParams();
   const { id: nameOrId } = params;
-  const navigate = useNavigate();
-  const pokemonQuery = usePokemon(nameOrId);
   const [activeVersion, setActiveVersion] = useState(DEFAULT_GAME_VERSION);
+  const pokemonQuery = usePokemon(nameOrId);
+  const speciesQuery = useSpecies(nameOrId);
+  const versionQuery = useGameVersion(activeVersion);
+  const versionGroupName = versionQuery?.data?.version_group.name;
+
+  const pokemonContract = {
+    ...speciesQuery.data,
+    ...pokemonQuery.data,
+  };
+
+  const hasError = pokemonQuery.isError || speciesQuery.isError;
+  const isLoading = pokemonQuery.isLoading || speciesQuery.isLoading;
 
   const {
     name,
@@ -40,60 +54,33 @@ function PokemonDetailsPage() {
     stats,
     base_experience: baseExperience,
     abilities,
-  }: any = pokemonQuery?.data || {};
+    flavor_text_entries: availableShortDescriptions,
+    evolution_chain: evolutionChain,
+    capture_rate: captureRate,
+    habitat,
+  }: Pokemon = pokemonContract;
 
-  const speciesQuery: any = useQuery(
-    ['species', nameOrId],
-    () => fetch(`https://pokeapi.co/api/v2/pokemon-species/${nameOrId}`).then(
-      (r) => {
-        if (!r.ok) {
-          throw Error(r.status + r.statusText);
-        }
-        return r.json();
-      },
-    ),
-    {
-      retry: 2,
-      staleTime: Infinity,
-      enabled: !pokemonQuery.isError,
-      onError: console.log,
-    },
-  );
-  const species = speciesQuery.data;
-
-  const versionQuery = useQuery(
-    ['version', activeVersion],
-    () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => {
-      if (!r.ok) {
-        throw Error(r.status + r.statusText);
-      }
-      return r.json();
-    }),
-    { retry: 2, staleTime: Infinity, enabled: !pokemonQuery.isError },
-  );
-
+  const { url: evolutionChainUrl } = evolutionChain || {};
+  const pokemonHabitat = habitat ? habitat?.name.replaceAll('-', ' ') : habitat;
   const homePicture = sprites?.other?.home.front_default;
   const officialArtwork = sprites?.other?.['official-artwork'].front_default;
-
   const avatar = homePicture || officialArtwork;
-  const { versions: spriteVersions } = sprites || {};
-  const vSprites: any = sprites
-    ? Object.values(spriteVersions).reduce((acc: any, el: any) => ({
-      ...acc,
-      ...el,
-    }))
-    : {};
-  const versionGroupName = versionQuery?.data?.version_group.name;
-  const pokemonVersionPreview = vSprites?.[versionGroupName]?.front_default;
 
-  const availableVersions = species?.flavor_text_entries
-    .filter((entry: any) => entry.language.name === 'en')
-    .map((e: any) => e.version.name);
-  const evolutionChainUrl = species?.evolution_chain?.url;
-  const captureRate = species?.capture_rate;
-  const habitat = species?.habitat
-    ? species?.habitat?.name.replaceAll('-', ' ')
-    : species?.habitat;
+  const { versions: spritesByGenerations } = sprites || {};
+
+  const flattenObject = (obj:NestedObject) => {
+    // eslint-disable-next-line max-len
+    const flat = Object.values(obj).reduce((acc: AnyObject, el: AnyObject) => ({ ...acc, ...el }));
+    return flat;
+  };
+
+  const spritesByVersions: AnyObject = spritesByGenerations ? flattenObject(spritesByGenerations) : {};
+
+  const pokemonVersionImagePreview = spritesByVersions?.[versionGroupName]?.front_default;
+
+  const availableVersions = availableShortDescriptions
+    ?.filter((entry: ShortDescription) => entry.language.name === 'en')
+    .map((e: ShortDescription) => e.version.name);
 
   useEffect(() => {
     if (
@@ -105,18 +92,18 @@ function PokemonDetailsPage() {
   }, [activeVersion, availableVersions]);
 
   const goToPreviousPokemon = useCallback(() => {
-    const previousPokemonId = parseInt(pokemonId, 10) - 1;
+    const previousPokemonId = pokemonId - 1;
     if (!Number.isInteger(previousPokemonId) || previousPokemonId < 1) return; // early return to prevent negative values
     navigate(`/pokemon/${previousPokemonId}`);
   }, [navigate, pokemonId]);
 
   const goToNextPokemon = useCallback(() => {
-    const nextPokemonId = parseInt(pokemonId, 10) + 1;
+    const nextPokemonId = pokemonId + 1;
     if (!Number.isInteger(nextPokemonId)) return;
     navigate(`/pokemon/${nextPokemonId}`);
   }, [navigate, pokemonId]);
 
-  if (pokemonQuery.isError) {
+  if (hasError) {
     return <>Error</>;
   }
 
@@ -137,7 +124,7 @@ function PokemonDetailsPage() {
         />
         <Card sx={{ boxShadow: '0 5px 10px #d0efef' }}>
           <CardContent>
-            {pokemonQuery.isLoading ? (
+            {isLoading ? (
               <Skeleton
                 animation="wave"
                 variant="rectangular"
@@ -150,13 +137,15 @@ function PokemonDetailsPage() {
                 sx={{
                   m: -2,
                   mb: 2,
-                  background: species ? species?.color?.name : 'silver',
+                  background: pokemonContract
+                    ? pokemonContract?.color?.name
+                    : 'silver',
                   height: '250px',
                 }}
               />
             )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              {pokemonQuery.isLoading ? (
+              {isLoading ? (
                 <Skeleton
                   animation="wave"
                   variant="text"
@@ -180,7 +169,7 @@ function PokemonDetailsPage() {
                   justifyContent: 'end',
                 }}
               >
-                {pokemonQuery.isLoading ? (
+                {isLoading ? (
                   <Skeleton
                     animation="wave"
                     variant="circular"
@@ -188,14 +177,14 @@ function PokemonDetailsPage() {
                     height={40}
                   />
                 ) : (
-                  types?.map((el: any) => (
+                  types?.map((el: PokemonType) => (
                     <PokemonTypeBadge key={el.type.name} type={el.type.name} />
                   ))
                 )}
               </Box>
             </Box>
             <Box sx={{ display: 'flex', mt: 2 }}>
-              {pokemonQuery.isLoading ? (
+              {isLoading ? (
                 <>
                   <Skeleton
                     animation="wave"
@@ -210,9 +199,9 @@ function PokemonDetailsPage() {
                 </>
               ) : (
                 <>
-                  {versionGroupName && pokemonVersionPreview && (
+                  {versionGroupName && pokemonVersionImagePreview && (
                     <Box sx={{ mr: 1, mb: 1 }}>
-                      <img className="" src={pokemonVersionPreview} />
+                      <img className="" src={pokemonVersionImagePreview} />
                     </Box>
                   )}
                   <Typography
@@ -220,8 +209,8 @@ function PokemonDetailsPage() {
                     variant="body2"
                     color="text.secondary"
                   >
-                    {species
-                      && species?.flavor_text_entries?.map(
+                    {pokemonContract
+                      && pokemonContract?.flavor_text_entries?.map(
                         (entry: any) => entry.language.name === 'en'
                           && entry.version.name === activeVersion
                           && entry.flavor_text,
@@ -230,7 +219,7 @@ function PokemonDetailsPage() {
                 </>
               )}
             </Box>
-            {pokemonQuery.isLoading ? (
+            {isLoading ? (
               <Skeleton
                 animation="wave"
                 variant="text"
@@ -287,7 +276,7 @@ function PokemonDetailsPage() {
           weight={weight}
           baseExperience={baseExperience}
           captureRate={captureRate}
-          habitat={habitat}
+          habitat={pokemonHabitat}
         />
         <PokemonAbilities
           abilities={abilities}
