@@ -81,7 +81,27 @@ export interface Pokemon {
     habitat?: ApiItem,
 }
 
+export interface Action {
+    type: string,
+    payload: string,
+}
+
+export interface RemoveAction {
+    type: string,
+    payload: string[],
+}
+
 export interface PokemonAction {
     type: string,
     payload: Pokemon,
+}
+
+export interface PokemonStore {
+    addedPokemonList: Pokemon[],
+    pokemonDetails: Pokemon | Record<string, never>,
+    favoritePokemonNames: string[],
+}
+
+export interface State {
+    pokedex: PokemonStore,
 }

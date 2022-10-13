@@ -26,7 +26,7 @@ function NameValidationInput({
   const [isValidating, setValidating] = useState<boolean>(false);
   const debouncedValue = useDebounce<string>(value, 500);
   const customPokemonList: Pokemon[] = useSelector(
-    (state: any) => state?.pokedex?.pokemonList,
+    (state: any) => state?.pokedex?.addedPokemonList,
   );
 
   const validate = useCallback(

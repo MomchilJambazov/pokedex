@@ -12,11 +12,12 @@ interface Props {
   action?: JSX.Element,
   severity: 'success' | 'error' | undefined,
   open: boolean,
+  closable?: boolean,
   setOpen: (open:boolean) => void,
 }
 
 const SnackbarAlert = ({
-  message, action, severity, open, setOpen,
+  message, action, severity, open, setOpen, closable,
 }:Props) => {
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -41,9 +42,11 @@ const SnackbarAlert = ({
         action={(
           <>
             {action}
+            {closable && (
             <IconButton onClick={handleClose} color="inherit" size="small">
               <CloseIcon fontSize="small" />
             </IconButton>
+            )}
           </>
         )}
       >
@@ -55,6 +58,7 @@ const SnackbarAlert = ({
 
 SnackbarAlert.defaultProps = {
   action: null,
+  closable: true,
 };
 
 export default SnackbarAlert;

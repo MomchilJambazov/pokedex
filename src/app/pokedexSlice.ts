@@ -1,19 +1,31 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Pokemon, PokemonAction } from './types';
+import { Action, PokemonAction, PokemonStore } from './types';
+
+const initialState: PokemonStore = {
+  addedPokemonList: [],
+  pokemonDetails: {},
+  favoritePokemonNames: [],
+};
 
 export const pokedexSlice = createSlice({
-  name: 'pokemons',
-  initialState: {
-    pokemonList: [] as Pokemon[],
-    pokemonDetails: {},
-  },
+  name: 'pokemon',
+  initialState,
   reducers: {
-    add: (state, action: PokemonAction) => {
-      state.pokemonList.push(action.payload);
-    },
+    createPokemon: (state, action: PokemonAction) => ({
+      ...state,
+      addedPokemonList: [...state.addedPokemonList, action.payload],
+    }),
+    addToFavorites: (state, action: Action) => ({
+      ...state,
+      favoritePokemonNames: [...state.favoritePokemonNames, action.payload],
+    }),
+    removeFromFavorites: (state, action: Action) => ({
+      ...state,
+      favoritePokemonNames: state.favoritePokemonNames.filter((name) => name !== action.payload),
+    }),
   },
 });
 
-export const { add } = pokedexSlice.actions;
+export const { createPokemon, addToFavorites, removeFromFavorites } = pokedexSlice.actions;
 
 export default pokedexSlice.reducer;

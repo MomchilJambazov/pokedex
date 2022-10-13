@@ -16,7 +16,7 @@ import NumberInput from '../../components/Inputs/NumberInput';
 import NameValidationInput from '../../components/Inputs/NameValidationInput';
 import PokemonTypeSelect from '../../components/Inputs/PokemonTypeSelect';
 import usePokemonApi from '../../hooks/usePokemonApi';
-import { DefaultValues, Pokemon } from '../../app/types';
+import { DefaultValues, Pokemon, State } from '../../app/types';
 import {
   POKEMON_HABITATS,
   POKEMON_COLORS,
@@ -58,7 +58,7 @@ const AddPokemonPage = () => {
   const pokemonQuery = usePokemonApi('');
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [showSuccessAlert, setSuccessAlert] = useState(false);
-  const pokemonList = useSelector((state:any) => state?.pokedex?.pokemonList);
+  const addedPokemonList = useSelector((state:State) => state?.pokedex?.addedPokemonList);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const lastCreatedPokemonId = useRef<number|null>(null);
@@ -66,7 +66,7 @@ const AddPokemonPage = () => {
   const generateId = () => {
     // TODO: This id generation does not check for id collision with other custom pokemon ids
     const pokemonCount = pokemonQuery.data.count || FALLBACK_POKEMON_COUNT; // fallback value for pokemon count retrieved from api
-    const customPokemonCount = pokemonList?.length;
+    const customPokemonCount = addedPokemonList?.length;
     const incrementedId = pokemonCount + customPokemonCount + 1;
     return incrementedId;
   };
@@ -82,7 +82,7 @@ const AddPokemonPage = () => {
 
     const pokemon: Pokemon = {
       id: newPokemonId,
-      name: data.name,
+      name: data.name.toLowerCase(),
       color: { name: data.color },
       height: data.height * 10,
       weight: data.weight * 10,
@@ -125,7 +125,7 @@ const AddPokemonPage = () => {
   const onSubmit:SubmitHandler<typeof defaultValues> = (data) => {
     const newPokemon = mapFormDataToPokemonContract(data as unknown as DefaultValues);
     dispatch({
-      type: 'pokemons/add',
+      type: 'pokemon/createPokemon',
       payload: newPokemon,
     });
     setSuccessAlert(true);
