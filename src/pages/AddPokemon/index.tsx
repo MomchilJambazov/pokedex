@@ -139,9 +139,8 @@ const AddPokemonPage = () => {
 
   return (
     <>
-      <Typography variant="h4" sx={{ my: 4 }}>
-        Add Pokemon
-      </Typography>
+      <Typography variant="h4" sx={{ my: 4, textAlign: 'center' }}>Add Pokemon</Typography>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={5}>
           <Grid item xs={6} md={4}>

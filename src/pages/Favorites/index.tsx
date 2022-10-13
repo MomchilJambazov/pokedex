@@ -17,8 +17,15 @@ function FavoritesPage() {
         ))}
       </Grid>
       {!favoritePokemonNames.length
-      && (<EmptyState title="Empty" subtitle="You don&apos;t have favorite Pokemon yet" linkTo="/pokedex" buttonColor="primary" />
-      )}
+        && (
+        <EmptyState
+          title="Empty"
+          subtitle="You don&apos;t have favorite Pokemon yet"
+          linkTo="/pokedex"
+          buttonColor="primary"
+          cta="Browse the Pokedex"
+        />
+        )}
     </>
   );
 }

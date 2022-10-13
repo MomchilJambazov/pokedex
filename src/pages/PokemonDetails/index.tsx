@@ -14,6 +14,7 @@ import useSpeciesApi from '../../hooks/useSpeciesApi';
 import useGameVersionApi from '../../hooks/useGameVersionApi';
 import { DEFAULT_GAME_VERSION } from '../../app/constants';
 import { Pokemon, State } from '../../app/types';
+import EmptyState from '../../components/EmptyState';
 
 interface Props {
   data: Pokemon,
@@ -100,6 +101,7 @@ function PokemonDetailsPageWithData({ data, hasError, isLoading }:Props) {
 }
 
 function PokemonDetailsPageWithApi({ nameOrId }: {nameOrId: string}) {
+  const [notFound, setNotFound] = useState(false);
   const pokemonQuery = usePokemonApi(nameOrId);
   const speciesQuery = useSpeciesApi(nameOrId);
   const pokemonData = {
@@ -107,10 +109,28 @@ function PokemonDetailsPageWithApi({ nameOrId }: {nameOrId: string}) {
     ...pokemonQuery.data,
   };
 
+  const { error } = pokemonQuery;
+
+  if (error instanceof Error) {
+    if (error.message.includes('404') && !notFound) {
+      setNotFound(true);
+    }
+  }
+
   const hasError = (pokemonQuery.isError || speciesQuery.isError);
   const isLoading = (pokemonQuery.isLoading || speciesQuery.isLoading);
 
-  return <PokemonDetailsPageWithData data={pokemonData} isLoading={isLoading} hasError={hasError} />;
+  return notFound
+    ? (
+      <EmptyState
+        title="404 Pokemon not found"
+        subtitle="The Pokemon you are looking for does not exist"
+        linkTo="/add-pokemon"
+        buttonColor="success"
+        cta="Create your own"
+      />
+    )
+    : <PokemonDetailsPageWithData data={pokemonData} isLoading={isLoading} hasError={hasError} />;
 }
 
 function PokemonDetailsPage() {
