@@ -1,6 +1,6 @@
 # Pokedex
-
 This project lists Pokemon and allows you to explore details about each creature. You can also create your own Pokemon and select your favorite ones.
+[Demo](https://momchiljambazov.github.io/pokedex)
 
 ## Process and decisions
 First steps after reading the requirements and the scope of the task:
