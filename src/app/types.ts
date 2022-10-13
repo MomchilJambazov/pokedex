@@ -81,7 +81,7 @@ export interface Pokemon {
     habitat?: ApiItem,
 }
 
-export interface Action {
-    type: string | Pokemon,
-    payload: string,
+export interface PokemonAction {
+    type: string,
+    payload: Pokemon,
 }

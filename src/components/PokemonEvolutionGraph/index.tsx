@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import styles from './index.module.scss';
+import { BASE_API_URL } from '../../app/constants';
 
 const TREE_HEIGHT = 350;
 
@@ -42,7 +43,7 @@ function PokemonEvolutionGraph({
     if (!chain?.species) return null;
     setLoading(true);
     const speciesData = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${chain?.species.name}`,
+      `${BASE_API_URL}/pokemon/${chain?.species.name}`,
     ).then((r) => r.json());
     const children = await Promise.all(
       chain?.evolves_to?.map((c: any) => generateTree(c)),

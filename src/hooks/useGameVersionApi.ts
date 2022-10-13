@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { BASE_API_URL } from '../app/constants';
 
-export default function useGameVersion(activeVersion: string) {
+export default function useGameVersionApi(activeVersion: string) {
   const queryInfo = useQuery(
     ['version', activeVersion],
-    () => fetch(`https://pokeapi.co/api/v2/version/${activeVersion}`).then((r) => {
+    () => fetch(`${BASE_API_URL}/version/${activeVersion}`).then((r) => {
       if (!r.ok) {
         throw Error(r.status + r.statusText);
       }

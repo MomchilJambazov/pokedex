@@ -3,13 +3,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import PokemonCard from '../../components/PokemonCard';
-import usePokemon from '../../hooks/usePokemon';
+import usePokemonApi from '../../hooks/usePokemonApi';
+import { Pokemon } from '../../app/types';
+import { DEFAULT_EMPTY_LIST_LENGTH } from '../../app/constants';
 
 function PokedexPage() {
   const [requestParams, setParams] = useState<string>('');
-  const query = usePokemon(requestParams);
-
-  const { data } = query;
+  const { data, isLoading } = usePokemonApi(requestParams);
 
   const next = data?.next ? `?${data?.next.split('?')[1]}` : '';
   const previous = data?.previous ? `?${data?.previous.split('?')[1]}` : '';
@@ -21,8 +21,8 @@ function PokedexPage() {
   return (
     <>
       <Grid sx={{ mt: 4 }} container spacing={2}>
-        {!data && renderEmptyList(20)}
-        {data?.results.map((pokemon: any) => (
+        {isLoading && renderEmptyList(DEFAULT_EMPTY_LIST_LENGTH)}
+        {data?.results.map((pokemon: Pokemon) => (
           <PokemonCard key={pokemon?.name} name={pokemon?.name} />
         ))}
       </Grid>

@@ -3,13 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { FieldProps } from '../../../app/types';
+import { BASE_API_URL } from '../../../app/constants';
 
 function AbilityAutocomplete({
   control, fieldName, label, required,
 }:FieldProps): JSX.Element {
   const abilitiesQuery = useQuery(
     ['abilities'],
-    () => fetch('https://pokeapi.co/api/v2/ability?limit=1000').then((r) => r.json()),
+    () => fetch(`${BASE_API_URL}/ability?limit=1000`).then((r) => r.json()),
     { retry: 2, staleTime: Infinity },
   );
 

@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
-import usePokemon from '../../hooks/usePokemon';
+import usePokemonApi from '../../hooks/usePokemonApi';
 import PokemonTypeBadge from '../PokemonTypeBadge';
 
 export interface PokemonCardProps {
@@ -42,7 +42,7 @@ const PokemonCardSkeleton = () => (
 );
 
 function PokemonCard({ name, isFetching }: PokemonCardProps) {
-  const query = usePokemon(name);
+  const query = usePokemonApi(name);
 
   const { data, isLoading, isError } = query;
   const image = data?.sprites?.other['official-artwork']?.front_default;

@@ -19,9 +19,9 @@ import PokemonOverview from '../../components/PokemonOverview';
 import PokemonAbilities from '../../components/PokemonAbilities';
 import PokemonStats from '../../components/PokemonStats';
 import PokemonEvolutionGraph from '../../components/PokemonEvolutionGraph';
-import usePokemon from '../../hooks/usePokemon';
-import useSpecies from '../../hooks/useSpecies';
-import useGameVersion from '../../hooks/useGameVersion';
+import usePokemonApi from '../../hooks/usePokemonApi';
+import useSpeciesApi from '../../hooks/useSpeciesApi';
+import useGameVersionApi from '../../hooks/useGameVersionApi';
 import { DEFAULT_GAME_VERSION } from '../../app/constants';
 import pokemonImageEmpty from '../../static/empty-pokeball.png';
 import {
@@ -33,9 +33,9 @@ function PokemonDetailsPage() {
   const params = useParams();
   const { id: nameOrId } = params;
   const [activeVersion, setActiveVersion] = useState(DEFAULT_GAME_VERSION);
-  const pokemonQuery = usePokemon(nameOrId);
-  const speciesQuery = useSpecies(nameOrId);
-  const versionQuery = useGameVersion(activeVersion);
+  const pokemonQuery = usePokemonApi(nameOrId);
+  const speciesQuery = useSpeciesApi(nameOrId);
+  const versionQuery = useGameVersionApi(activeVersion);
   const versionGroupName = versionQuery?.data?.version_group.name;
   const customPokemonList: Pokemon[] = useSelector((state:any) => state?.pokedex?.pokemonList);
 
@@ -112,6 +112,12 @@ function PokemonDetailsPage() {
     return <>Error</>;
   }
 
+  const getPokemonEnglishFlavorText = () => availableShortDescriptions?.map(
+    (entry: ShortDescription) => entry.language.name === 'en'
+      && entry.version.name === activeVersion
+      && entry.flavor_text,
+  );
+
   return (
     <Grid container spacing={2} sx={{ mt: 12 }}>
       <Grid item xs={12} md={6} lg={4} sx={{ position: 'relative' }}>
@@ -146,7 +152,7 @@ function PokemonDetailsPage() {
                   m: -2,
                   mb: 2,
                   background: pokemonData
-                    ? pokemonData?.color?.name
+                    ? pokemonData.color.name
                     : 'silver',
                   height: '250px',
                 }}
@@ -217,12 +223,7 @@ function PokemonDetailsPage() {
                     variant="body2"
                     color="text.secondary"
                   >
-                    {pokemonData
-                      && pokemonData.flavor_text_entries.map(
-                        (entry: any) => entry.language.name === 'en'
-                          && entry.version.name === activeVersion
-                          && entry.flavor_text,
-                      )}
+                    {getPokemonEnglishFlavorText()}
                   </Typography>
                 </>
               )}

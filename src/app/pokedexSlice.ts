@@ -1,16 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Pokemon, Action } from './types';
+import { Pokemon, PokemonAction } from './types';
 
 export const pokedexSlice = createSlice({
   name: 'pokemons',
   initialState: {
-    pokemonList: [],
+    pokemonList: [] as Pokemon[],
     pokemonDetails: {},
   },
   reducers: {
-    add: (state, action: Action) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+    add: (state, action: PokemonAction) => {
       state.pokemonList.push(action.payload);
     },
   },

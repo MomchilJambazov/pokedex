@@ -15,7 +15,7 @@ import AbilityAutocomplete from '../../components/Inputs/AbilityAutocomplete';
 import NumberInput from '../../components/Inputs/NumberInput';
 import NameValidationInput from '../../components/Inputs/NameValidationInput';
 import PokemonTypeSelect from '../../components/Inputs/PokemonTypeSelect';
-import usePokemon from '../../hooks/usePokemon';
+import usePokemonApi from '../../hooks/usePokemonApi';
 import { DefaultValues, Pokemon } from '../../app/types';
 import {
   POKEMON_HABITATS,
@@ -55,7 +55,7 @@ const AddPokemonPage = () => {
   const {
     control, setValue, reset, handleSubmit, setError, formState: { errors }, clearErrors,
   } = useForm({ defaultValues });
-  const pokemonQuery = usePokemon('');
+  const pokemonQuery = usePokemonApi('');
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [showSuccessAlert, setSuccessAlert] = useState(false);
   const pokemonList = useSelector((state:any) => state?.pokedex?.pokemonList);
