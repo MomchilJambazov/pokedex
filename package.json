@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "This project lists Pokemon and allows you to explore details about each creature. You can also create your own Pokemon and select your favorite ones.",
   "private": false,
-  "homepage": "./",
+  "homepage": "https://momchiljambazov.github.io/pokedex/",
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
@@ -41,6 +41,7 @@
     "eslint-plugin-jsx-a11y": "^6.6.0",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "gh-pages": "^4.0.0",
     "prop-types": "^15.8.1",
     "sass": "^1.53.0",
     "stylelint": "^14.9.1",
@@ -49,6 +50,8 @@
     "webpack": "^5.73.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "env-cmd --no-override -f ./.env-override/.env.production react-scripts build",
     "build:d": "env-cmd --no-override -f ./.env-override/.env.development react-scripts build",
     "build:l": "env-cmd --no-override -f ./.env-override/.env.local react-scripts build",

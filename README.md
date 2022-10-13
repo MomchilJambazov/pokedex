@@ -38,7 +38,8 @@ feature should be considered as a rough POC.
 - add error boundaries to critical components, improve error handling and error states
 - add unit tests and improve on test coverage
 - use aliases instead of relative paths in imports 
-- add precommit and integrate linting and test suite as part of the CI/CD pipeline  
+- add precommit and integrate linting and test suite as part of the CI/CD pipeline
+- fix dependency security vulnerabilities, possibly add Snyk   
 
 ## Running & Debugging the application for the first time
 1. Clone repo:
