@@ -56,9 +56,13 @@ function PokedexKeyboardNavigation(props: PokedexKeyboardNavigationProps) {
   }, [next, prev, navigate]);
 
   return (
-    <Box sx={{ position: 'fixed', right: '20px', bottom: '10px' }}>
+    <Box sx={{
+      position: 'fixed', right: '20px', bottom: '10px', zIndex: 10,
+    }}
+    >
       <Collapse in={showHelp}>
         <Alert
+          style={{ background: 'white' }}
           variant="outlined"
           severity="info"
           action={(
