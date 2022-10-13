@@ -24,7 +24,7 @@ function DropdownSelect({
             {!required && <MenuItem key="none" value="">None</MenuItem>}
             {options.map((option) => (
               <MenuItem sx={{ textTransform: 'capitalize' }} key={option} value={option}>
-                {option.replaceAll('-', ' ')}
+                {option.replace('-', ' ')}
               </MenuItem>
             ))}
           </Select>

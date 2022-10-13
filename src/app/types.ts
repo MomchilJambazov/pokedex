@@ -76,7 +76,7 @@ export interface Pokemon {
     base_experience: number,
     abilities: PokemonAbility[],
     flavor_text_entries: ShortDescription[],
-    evolution_chain: ApiItem | null,
+    evolution_chain: { url: string} | null,
     capture_rate: number,
     habitat?: ApiItem,
 }

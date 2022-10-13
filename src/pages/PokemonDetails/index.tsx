@@ -70,6 +70,11 @@ function PokemonDetailsPageWithData({ data, hasError, isLoading }:Props) {
           isLoading={isLoading}
           hasError={hasError}
         />
+        {/*
+          Experimental feature! We need to measure customer satisfaction.
+          There are know issues, related to non sequential Pokemon ids,
+          that will disturb normal experience after Pokemon ~900
+        */}
         <PokedexKeyboardNavigation
           next={goToNextPokemon}
           prev={goToPreviousPokemon}
@@ -136,7 +141,7 @@ function PokemonDetailsPageWithApi({ nameOrId }: {nameOrId: string}) {
 function PokemonDetailsPage() {
   const params = useParams();
   const { id: nameOrId } = params;
-  const addedPokemonList: Pokemon[] = useSelector((state:State) => state?.pokedex?.addedPokemonList);
+  const addedPokemonList = useSelector((state:State) => state?.pokedex?.addedPokemonList);
   const customPokemon = addedPokemonList.find(({ name, id }) => nameOrId === name || nameOrId === id?.toString());
 
   return customPokemon

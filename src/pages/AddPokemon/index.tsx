@@ -64,7 +64,9 @@ const AddPokemonPage = () => {
   const lastCreatedPokemonId = useRef<number|null>(null);
 
   const generateId = () => {
-    // TODO: This id generation does not check for id collision with other custom pokemon ids
+    // TODO: This id generation does not check for id collision with
+    // other custom pokemon ids and non sequential API ids
+    // example: http://localhost:3000/pokemon/10249
     const pokemonCount = pokemonQuery.data.count || FALLBACK_POKEMON_COUNT; // fallback value for pokemon count retrieved from api
     const customPokemonCount = addedPokemonList?.length;
     const incrementedId = pokemonCount + customPokemonCount + 1;

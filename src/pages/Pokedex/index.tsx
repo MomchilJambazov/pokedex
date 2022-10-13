@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -7,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import PokemonCard from '../../components/PokemonCard';
 import usePokemonApi from '../../hooks/usePokemonApi';
-import { Pokemon } from '../../app/types';
+import { Pokemon, State } from '../../app/types';
 import { RESULTS_PER_PAGE } from '../../app/constants';
 
 interface PageControlsProps {
@@ -67,6 +68,7 @@ const PageControls = ({
 function PokedexPage() {
   const [resultsPerPage, setResultsPerPage] = useState(RESULTS_PER_PAGE[0]);
   const [requestParams, setParams] = useState<string>(`?limit=${resultsPerPage}`);
+  const addedPokemonList = useSelector((state:State) => state?.pokedex?.addedPokemonList);
   const { data, isLoading } = usePokemonApi(requestParams);
 
   const renderEmptyList = (numberOfElements:number) => (
@@ -82,6 +84,14 @@ function PokedexPage() {
       <Grid sx={{ mt: 4 }} container spacing={2}>
         {isLoading && renderEmptyList(resultsPerPage)}
         {data?.results.map((pokemon: Pokemon) => (
+          <PokemonCard key={pokemon?.name} name={pokemon?.name} />
+        ))}
+        {/*
+          TODO: When API pages are exhausted and there is no next page we are then listing
+          all custom added pokemons, they will not be paginated. This functionality can be
+          improved, when other features like search, sort and filtering are implemented.
+        */}
+        {!isLoading && !data?.next && addedPokemonList.map((pokemon: Pokemon) => (
           <PokemonCard key={pokemon?.name} name={pokemon?.name} />
         ))}
       </Grid>

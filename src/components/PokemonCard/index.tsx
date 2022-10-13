@@ -50,9 +50,8 @@ const PokemonCardSkeleton = () => (
   </Card>
 );
 
-function PokemonCardWithData({ data, isLoading, hasError }: PokemonCardProps) {
+export function PokemonCardWithData({ data, isLoading, hasError }: PokemonCardProps) {
   const image = data?.sprites?.other['official-artwork']?.front_default || data?.sprites?.other.home?.front_default;
-
   return (
     <Grid item xs={12} md={6} lg={4}>
       {(isLoading || hasError)
@@ -112,7 +111,7 @@ function PokemonCardWithApi({ name, isFetching = false }: Props) {
 }
 
 function PokemonCard({ name, isFetching }: Props) {
-  const lowerCasedName = name.toLowerCase();
+  const lowerCasedName = name?.toLowerCase();
   const addedPokemonList = useSelector((state:State) => state?.pokedex?.addedPokemonList);
   const customPokemon = addedPokemonList?.find((pokemon) => pokemon.name.toLowerCase() === lowerCasedName);
   return customPokemon?.name

@@ -1,3 +1,5 @@
+import { State } from './types';
+
 const KEY = 'redux-store';
 export function loadState() {
   try {
@@ -9,11 +11,11 @@ export function loadState() {
   }
 }
 
-export async function saveState(state: any) {
+export async function saveState(state: State) {
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem(KEY, serializedState);
   } catch (e) {
-    // Ignore errro
+    // Ignored error if write operation to localStorage fails
   }
 }
