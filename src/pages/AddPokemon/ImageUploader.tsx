@@ -94,7 +94,7 @@ const ImageUpload = ({
     <>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         {selectedFile ? <img src={URI} width="100%" /> : <ImagePreviewEmpty inputRef={fileInputEl} />}
-        <input ref={fileInputEl} type="file" onChange={onSelectFile} />
+        <input ref={fileInputEl} type="file" onChange={onSelectFile} accept="image/*" />
         <br />
         <small><i>Maximum file size is 200KB</i></small>
       </Box>

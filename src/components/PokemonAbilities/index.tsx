@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import { useQuery } from '@tanstack/react-query';
+import { BASE_API_URL } from '../../app/constants';
 
 const TextBlockSkeleton = () => (
   <Box width="100%">
@@ -21,8 +22,8 @@ function AbilityCardSkeleton() {
 
 function AbilityCard({ ability, versionGroup }: any) {
   const abilityQuery = useQuery(
-    ['ability', ability?.name],
-    () => fetch(ability.url).then((r) => r.json()),
+    ['ability', ability.name],
+    () => fetch(`${BASE_API_URL}/ability/${ability.name}`).then((r) => r.json()),
     { retry: 2, staleTime: Infinity },
   );
   const {

@@ -23,7 +23,7 @@ import usePokemon from '../../hooks/usePokemon';
 import useSpecies from '../../hooks/useSpecies';
 import useGameVersion from '../../hooks/useGameVersion';
 import { DEFAULT_GAME_VERSION } from '../../app/constants';
-
+import pokemonImageEmpty from '../../static/empty-pokeball.png';
 import {
   AnyObject, NestedObject, ShortDescription, Pokemon, PokemonType,
 } from '../../app/types';
@@ -67,10 +67,10 @@ function PokemonDetailsPage() {
   }: Pokemon = pokemonData;
 
   const { url: evolutionChainUrl } = evolutionChain || {};
-  const pokemonHabitat = habitat ? habitat?.name.replaceAll('-', ' ') : habitat;
+  const pokemonHabitat = habitat ? habitat?.name.replaceAll('-', ' ') : null;
   const homePicture = sprites?.other?.home.front_default;
   const officialArtwork = sprites?.other?.['official-artwork']?.front_default;
-  const avatar = homePicture || officialArtwork;
+  const avatar = homePicture || officialArtwork || pokemonImageEmpty;
 
   const { versions: spritesByGenerations } = sprites || {};
 
@@ -115,18 +115,21 @@ function PokemonDetailsPage() {
   return (
     <Grid container spacing={2} sx={{ mt: 12 }}>
       <Grid item xs={12} md={6} lg={4} sx={{ position: 'relative' }}>
-        <img
-          src={avatar}
-          alt={name}
-          style={{
-            margin: '0 auto',
-            left: 0,
-            right: 0,
-            maxHeight: '390px',
-            position: 'absolute',
-            top: '-105px',
-          }}
-        />
+        {!isLoading && (
+          <img
+            src={avatar}
+            alt={name}
+            style={{
+              margin: '0 auto',
+              left: 0,
+              right: 0,
+              maxHeight: '390px',
+              maxWidth: '390px',
+              position: 'absolute',
+              top: '-105px',
+            }}
+          />
+        )}
         <Card sx={{ boxShadow: '0 5px 10px #d0efef' }}>
           <CardContent>
             {isLoading ? (
@@ -183,7 +186,7 @@ function PokemonDetailsPage() {
                   />
                 ) : (
                   types?.map((el: PokemonType) => (
-                    <PokemonTypeBadge key={el.type.name} type={el.type.name} />
+                    el.type.name && <PokemonTypeBadge key={el.type.name} type={el.type.name} />
                   ))
                 )}
               </Box>
@@ -215,7 +218,7 @@ function PokemonDetailsPage() {
                     color="text.secondary"
                   >
                     {pokemonData
-                      && pokemonData?.flavor_text_entries?.map(
+                      && pokemonData.flavor_text_entries.map(
                         (entry: any) => entry.language.name === 'en'
                           && entry.version.name === activeVersion
                           && entry.flavor_text,

@@ -13,6 +13,7 @@ import SliderWithLabel from '../../components/Inputs/SliderWithLabel';
 import DropdownSelect from '../../components/Inputs/DropdownSelect';
 import AbilityAutocomplete from '../../components/Inputs/AbilityAutocomplete';
 import NumberInput from '../../components/Inputs/NumberInput';
+import NameValidationInput from '../../components/Inputs/NameValidationInput';
 import PokemonTypeSelect from '../../components/Inputs/PokemonTypeSelect';
 import usePokemon from '../../hooks/usePokemon';
 import { DefaultValues, Pokemon } from '../../app/types';
@@ -23,7 +24,6 @@ import {
   MAX_HEIGHT_M,
   MAX_CAPTURE_RATE,
   MAX_BASE_EXPERIENCE,
-  MAX_POKEMON_NAME_LENGTH,
   MAX_POKEMON_SHORT_DESCRIPTION_LENGTH,
   FALLBACK_POKEMON_COUNT,
 } from '../../app/constants';
@@ -53,7 +53,7 @@ const defaultValues = {
 
 const AddPokemonPage = () => {
   const {
-    control, setValue, reset, handleSubmit,
+    control, setValue, reset, handleSubmit, setError, formState: { errors }, clearErrors,
   } = useForm({ defaultValues });
   const pokemonQuery = usePokemon('');
   const [lastUpdate, setLastUpdate] = useState(Date.now());
@@ -83,6 +83,7 @@ const AddPokemonPage = () => {
     const pokemon: Pokemon = {
       id: newPokemonId,
       name: data.name,
+      color: { name: data.color },
       height: data.height * 10,
       weight: data.weight * 10,
       base_experience: data.base_experience,
@@ -148,21 +149,13 @@ const AddPokemonPage = () => {
           </Grid>
           <Grid item xs={6} md={8}>
             <Typography variant="h6">Pokemon details</Typography>
-            <Controller
-              name="name"
+            <NameValidationInput
               control={control}
-              render={({ field }) => (
-                <TextField
-                  required
-                  label="Name"
-                  fullWidth
-                  inputProps={{
-                    maxLength: MAX_POKEMON_NAME_LENGTH,
-                  }}
-                  variant="outlined"
-                  {...field}
-                />
-              )}
+              fieldName="name"
+              label="Name"
+              setError={setError}
+              errors={errors}
+              clearErrors={clearErrors}
             />
             <Controller
               name="short_description"

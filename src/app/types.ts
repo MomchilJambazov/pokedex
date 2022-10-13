@@ -1,3 +1,5 @@
+import { POKEMON_COLORS } from './constants';
+
 export interface ApiItem {
     name: string,
     url?: string,
@@ -67,6 +69,7 @@ export interface Pokemon {
     sprites: AnyObject,
     types: PokemonType[],
     id: number,
+    color: { name: typeof POKEMON_COLORS[number]},
     height: number,
     weight: number,
     stats: PokemonStat[],

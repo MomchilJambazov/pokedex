@@ -17,7 +17,7 @@ interface PokemonOverviewProps {
 }
 
 function MiniCard({ label, value }: MiniCardProps) {
-  if (value === null) return null;
+  if (!value) return null;
   return (
     <Card
       sx={{
