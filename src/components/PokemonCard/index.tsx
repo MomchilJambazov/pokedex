@@ -60,7 +60,7 @@ function PokemonCardWithData({ data, isLoading, hasError }: PokemonCardProps) {
         : (
           <Box sx={{ position: 'relative' }}>
             <Link style={{ textDecoration: 'none' }} to={`/pokemon/${data.name}`}>
-              <Card sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Card sx={{ display: 'flex', justifyContent: 'space-between', minHeight: '150px' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <CardContent sx={{ flex: '1 0 auto' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
