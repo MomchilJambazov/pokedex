@@ -12,14 +12,25 @@ First steps after reading the requirements and the scope of the task:
 
 ### Tools
 #### ReactQuery
+ReactQuery is the tool of choice for the server-side data. Of the shelf it manages API cache, request loading state, network failures, and more. Simple and easy to use and configure, yet powerfull in terms of performance, UX optimization and reduction of the number of requests. Given that the API data is not expected to change (or at least not frequently). 
 
 #### Redux Toolkit
-#### D3 for evolution tree generation
+Custom Pokemon data required centralized store solution as most of the components needed to access the data. Redux was chosen to manage the client-side data as the industry standard. Performance, store immutability and past experience were the factors that prevailed in favor of Redux.
 
-### Known issues and further development
+#### React Hook Form
+Chosen for form control and validation features.
+
+#### D3 for evolution tree generation
+The evolution tree was considered as an important component to navigate the Pokedex. This is why we needed a realiable solution to visualize more complex data trees. 
+
+### Known issues and limitations
 The id generation does not check for id collision with other custom and api pokemon ids
 ID generation is not sequential and with existing implementation it's hard to predict
 previous/next values. In real world scenarios backend should orchestrate prev/next.
+
+Local storage allows us to store up to 5MB of data. As we are storing all custom added Pokemons 
+and their base64 encoded images, this storage can get exhausted quickly. The mocked add Pokemon
+feature should be considered as a rough POC.
 
 ### TODOs and further improvements:
 - add search, filtering and sorting to Pokemon lists
