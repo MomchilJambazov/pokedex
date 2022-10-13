@@ -15,27 +15,18 @@ import useGameVersionApi from '../../hooks/useGameVersionApi';
 import { DEFAULT_GAME_VERSION } from '../../app/constants';
 import { Pokemon, State } from '../../app/types';
 
-function PokemonDetailsPage() {
+interface Props {
+  data: Pokemon,
+  hasError: boolean,
+  isLoading: boolean
+}
+
+function PokemonDetailsPageWithData({ data, hasError, isLoading }:Props) {
   const navigate = useNavigate();
-  const params = useParams();
-  const { id: nameOrId } = params;
   const [activeVersion, setActiveVersion] = useState(DEFAULT_GAME_VERSION);
-  const pokemonQuery = usePokemonApi(nameOrId);
-  const speciesQuery = useSpeciesApi(nameOrId);
+
   const versionQuery = useGameVersionApi(activeVersion);
   const versionGroupName = versionQuery?.data?.version_group.name;
-  const addedPokemonList: Pokemon[] = useSelector((state:State) => state?.pokedex?.addedPokemonList);
-
-  // eslint-disable-next-line max-len
-  const customPokemon = addedPokemonList.find(({ name, id }) => nameOrId === name || nameOrId === id?.toString()) || null;
-
-  const pokemonData = customPokemon || {
-    ...speciesQuery.data,
-    ...pokemonQuery.data,
-  };
-
-  const hasError = (pokemonQuery.isError || speciesQuery.isError) && !customPokemon;
-  const isLoading = (pokemonQuery.isLoading || speciesQuery.isLoading) && !customPokemon;
 
   const {
     name,
@@ -48,7 +39,7 @@ function PokemonDetailsPage() {
     evolution_chain: evolutionChain,
     capture_rate: captureRate,
     habitat,
-  }: Pokemon = pokemonData;
+  }: Pokemon = data;
 
   const { url: evolutionChainUrl } = evolutionChain || {};
   const pokemonHabitat = habitat ? habitat?.name.replaceAll('-', ' ') : null;
@@ -69,7 +60,7 @@ function PokemonDetailsPage() {
     <Grid container spacing={2} sx={{ mt: 12 }}>
       <Grid item xs={12} md={6} lg={4} sx={{ position: 'relative' }}>
         <PokemonIntroCard
-          data={pokemonData}
+          data={data}
           activeVersion={activeVersion}
           setActiveVersion={setActiveVersion}
           versionGroup={versionGroupName}
@@ -106,6 +97,31 @@ function PokemonDetailsPage() {
       <SnackbarAlert open={hasError} severity="error" message="Something went wrong" setOpen={() => {}} closable={false} />
     </Grid>
   );
+}
+
+function PokemonDetailsPageWithApi({ nameOrId }: {nameOrId: string}) {
+  const pokemonQuery = usePokemonApi(nameOrId);
+  const speciesQuery = useSpeciesApi(nameOrId);
+  const pokemonData = {
+    ...speciesQuery.data,
+    ...pokemonQuery.data,
+  };
+
+  const hasError = (pokemonQuery.isError || speciesQuery.isError);
+  const isLoading = (pokemonQuery.isLoading || speciesQuery.isLoading);
+
+  return <PokemonDetailsPageWithData data={pokemonData} isLoading={isLoading} hasError={hasError} />;
+}
+
+function PokemonDetailsPage() {
+  const params = useParams();
+  const { id: nameOrId } = params;
+  const addedPokemonList: Pokemon[] = useSelector((state:State) => state?.pokedex?.addedPokemonList);
+  const customPokemon = addedPokemonList.find(({ name, id }) => nameOrId === name || nameOrId === id?.toString());
+
+  return customPokemon
+    ? <PokemonDetailsPageWithData data={customPokemon} isLoading={false} hasError={false} />
+    : <PokemonDetailsPageWithApi nameOrId={nameOrId || ''} />;
 }
 
 export default PokemonDetailsPage;
